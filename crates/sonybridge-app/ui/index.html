@@ -17,7 +17,7 @@
           </svg>
         </div>
         <div class="brand-text">
-          <h1>SonyBridge <span class="ver-badge">v0.2.0</span></h1>
+          <h1>SonyBridge <span class="ver-badge">v0.3.0</span></h1>
           <span class="device-name" id="device-name" data-i18n="subtitle">WH-1000XM3 / XM4 / XM5 Desktop Companion</span>
         </div>
       </div>
@@ -36,8 +36,8 @@
         </select>
         <button class="btn btn-secondary btn-sm" id="btn-open-wizard" title="Open Setup Guide">Wizard</button>
         <div class="connection-pill" id="connection-pill">
-          <span class="status-dot connected" id="status-dot"></span>
-          <span id="connection-text" data-i18n="status_connected">Connected</span>
+          <span class="status-dot standby" id="status-dot"></span>
+          <span id="connection-text">Checking...</span>
         </div>
         <button class="btn btn-secondary btn-sm" id="btn-reconnect" title="Refresh Bluetooth link">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
@@ -59,6 +59,23 @@
       </div>
     </div>
 
+    <!-- Dynamic Bluetooth Diagnostics Banner -->
+    <div class="connection-banner" id="connection-banner" style="display: none;">
+      <div class="banner-header">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <span id="banner-title">Bluetooth Connection Alert</span>
+      </div>
+      <div class="banner-body" id="banner-body"></div>
+      <ol class="banner-steps" id="banner-steps"></ol>
+      <div class="banner-actions">
+        <button class="btn btn-primary btn-sm" id="btn-banner-bluetooth">Open Windows Bluetooth Settings</button>
+        <button class="btn btn-secondary btn-sm" id="btn-banner-sound">Open Sound Settings</button>
+        <button class="btn btn-secondary btn-sm" id="btn-banner-reconnect">Re-Scan Bluetooth</button>
+      </div>
+    </div>
+
     <!-- TAB 1: Main Dashboard & Equalizer -->
     <main class="main-grid tab-panel active" id="tab-dashboard">
       <!-- Left Column: Battery & ANC Controls -->
@@ -70,13 +87,13 @@
           <div class="battery-gauge">
             <div class="battery-icon-container">
               <div class="battery-outline">
-                <div class="battery-fill" id="battery-fill" style="width: 85%;"></div>
+                <div class="battery-fill" id="battery-fill" style="width: 0%;"></div>
               </div>
               <div class="battery-tip"></div>
             </div>
             <div class="battery-info">
-              <span class="battery-pct" id="battery-pct">85%</span>
-              <span class="battery-status" id="battery-status">Bluetooth Stereo A2DP • Ready</span>
+              <span class="battery-pct" id="battery-pct">--</span>
+              <span class="battery-status" id="battery-status">Checking connection...</span>
             </div>
           </div>
         </div>
@@ -231,6 +248,19 @@
 
           <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 0.5rem;">
             <div class="setting-text">
+              <h3>Windows Bluetooth & Audio Diagnostics</h3>
+              <p>Directly inspect pairing state (Classic vs Bluetooth LE beacon) and open Windows Settings.</p>
+              <div id="diag-summary" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Status: Checking environment...</div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm" id="btn-open-bt-settings">Bluetooth Settings</button>
+              <button class="btn btn-secondary btn-sm" id="btn-open-sound-settings">Sound Settings</button>
+              <button class="btn btn-primary btn-sm" id="btn-run-diag">Run Diagnostic</button>
+            </div>
+          </div>
+
+          <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 0.5rem;">
+            <div class="setting-text">
               <h3>Maintenance & Guided Tools</h3>
               <p>Re-launch the setup onboarding wizard, run terminal diagnostic probe, or cleanly uninstall SonyBridge.</p>
             </div>
@@ -334,7 +364,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <span>SonyBridge v0.2.0 • System Tray Active</span>
+      <span>SonyBridge v0.3.0 • System Tray Active</span>
       <span class="status-fine" id="status-fine">MDR v1 Wire Framing Ready • 0% Idle CPU</span>
     </footer>
   </div>

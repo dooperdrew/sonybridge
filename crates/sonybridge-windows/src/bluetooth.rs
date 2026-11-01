@@ -4,7 +4,7 @@ use std::fmt::Debug;
 use std::sync::Mutex;
 use thiserror::Error;
 use windows::core::{GUID, HSTRING};
-use windows::Devices::Bluetooth::BluetoothDevice;
+use windows::Devices::Bluetooth::{BluetoothDevice, BluetoothLEDevice};
 use windows::Devices::Enumeration::DeviceInformation;
 use windows::Networking::Sockets::StreamSocket;
 use windows::Storage::Streams::{DataReader, DataWriter, InputStreamOptions};
@@ -92,6 +92,153 @@ impl WindowsBluetoothManager {
         }
         Ok(results)
     }
+
+    /// Enumerate paired Bluetooth LE devices and filter for Sony headphone devices.
+    pub async fn discover_paired_sony_ble_devices() -> Result<Vec<String>, BluetoothError> {
+        let selector = BluetoothLEDevice::GetDeviceSelectorFromPairingState(true)?;
+        let devices = DeviceInformation::FindAllAsyncAqsFilter(&selector)?.get()?;
+
+        let mut results = Vec::new();
+        for device_info in devices {
+            let name = device_info.Name()?.to_string();
+            let lower_name = name.to_lowercase();
+            if lower_name.contains("wh-1000")
+                || lower_name.contains("wf-1000")
+                || lower_name.contains("sony")
+                || lower_name.contains("mdr-")
+            {
+                results.push(name);
+            }
+        }
+        Ok(results)
+    }
+
+    /// Comprehensive connection diagnostic check inspecting Classic Bluetooth, BLE, and Audio endpoints.
+    pub async fn run_connection_diagnostics() -> ConnectionDiagnostics {
+        let classic_devices = Self::discover_paired_sony_devices()
+            .await
+            .unwrap_or_default();
+        let ble_devices = Self::discover_paired_sony_ble_devices()
+            .await
+            .unwrap_or_default();
+        let audio_endpoints =
+            crate::audio::AudioEndpointSanitizer::enumerate_render_endpoints().unwrap_or_default();
+        let hands_free_active = crate::audio::AudioEndpointSanitizer::is_hands_free_active();
+
+        let classic_active = classic_devices.iter().find(|d| d.is_connected);
+        let ble_found = ble_devices.first().cloned();
+        let default_audio = audio_endpoints
+            .iter()
+            .find(|e| e.is_default)
+            .map(|e| e.name.clone());
+
+        if let Some(active) = classic_active {
+            ConnectionDiagnostics {
+                is_connected: true,
+                status: "connected".to_string(),
+                device_name: Some(active.name.clone()),
+                mac_address: Some(format!("{:012X}", active.mac_address)),
+                classic_paired: true,
+                ble_paired: ble_found.is_some(),
+                ble_device_name: ble_found,
+                audio_endpoints_count: audio_endpoints.len(),
+                hands_free_active,
+                default_audio_endpoint: default_audio,
+                battery_percent: None,
+                message: format!(
+                    "Connected to {} via Classic Bluetooth & RFCOMM.",
+                    active.name
+                ),
+                troubleshooting_steps: Vec::new(),
+            }
+        } else if !classic_devices.is_empty() {
+            let first = &classic_devices[0];
+            ConnectionDiagnostics {
+                is_connected: false,
+                status: "disconnected".to_string(),
+                device_name: Some(first.name.clone()),
+                mac_address: Some(format!("{:012X}", first.mac_address)),
+                classic_paired: true,
+                ble_paired: ble_found.is_some(),
+                ble_device_name: ble_found,
+                audio_endpoints_count: audio_endpoints.len(),
+                hands_free_active,
+                default_audio_endpoint: default_audio,
+                battery_percent: None,
+                message: format!(
+                    "'{}' is paired in Windows but currently disconnected or powered off.",
+                    first.name
+                ),
+                troubleshooting_steps: vec![
+                    "Turn on your headphones (press Power once).".to_string(),
+                    "Ensure your headphones are within Bluetooth range.".to_string(),
+                    "Click 'Reconnect' in SonyBridge once powered on.".to_string(),
+                ],
+            }
+        } else if let Some(ble_name) = ble_found {
+            ConnectionDiagnostics {
+                is_connected: false,
+                status: "ble_only".to_string(),
+                device_name: None,
+                mac_address: None,
+                classic_paired: false,
+                ble_paired: true,
+                ble_device_name: Some(ble_name.clone()),
+                audio_endpoints_count: audio_endpoints.len(),
+                hands_free_active,
+                default_audio_endpoint: default_audio,
+                battery_percent: None,
+                message: format!(
+                    "Found '{ble_name}' (Bluetooth Low Energy beacon only). Audio & MDR controls require Classic Bluetooth pairing."
+                ),
+                troubleshooting_steps: vec![
+                    "Turn headphones completely OFF.".to_string(),
+                    "Press and hold the Power button for 7 SECONDS until you hear 'Bluetooth pairing'.".to_string(),
+                    "In Windows Settings -> Bluetooth & devices -> Add device -> Bluetooth, select 'WH-1000XM3' (headphone icon, NOT LE_).".to_string(),
+                    "Once paired, return to SonyBridge and click 'Reconnect'.".to_string(),
+                ],
+            }
+        } else {
+            ConnectionDiagnostics {
+                is_connected: false,
+                status: "not_paired".to_string(),
+                device_name: None,
+                mac_address: None,
+                classic_paired: false,
+                ble_paired: false,
+                ble_device_name: None,
+                audio_endpoints_count: audio_endpoints.len(),
+                hands_free_active,
+                default_audio_endpoint: default_audio,
+                battery_percent: None,
+                message: "No Sony Bluetooth headphones detected in Windows.".to_string(),
+                troubleshooting_steps: vec![
+                    "Ensure your PC has Bluetooth enabled.".to_string(),
+                    "Put your headphones into pairing mode by holding the Power button for 7 seconds until 'Bluetooth pairing' is announced.".to_string(),
+                    "Open Windows Settings -> Bluetooth & devices -> Add device -> Bluetooth, and pair your headphones.".to_string(),
+                    "Click 'Reconnect' once paired.".to_string(),
+                ],
+            }
+        }
+    }
+}
+
+/// Comprehensive connection diagnostic telemetry for UI presentation and troubleshooting.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ConnectionDiagnostics {
+    pub is_connected: bool,
+    pub status: String,
+    pub device_name: Option<String>,
+    pub mac_address: Option<String>,
+    pub classic_paired: bool,
+    pub ble_paired: bool,
+    pub ble_device_name: Option<String>,
+    pub audio_endpoints_count: usize,
+    pub hands_free_active: bool,
+    pub default_audio_endpoint: Option<String>,
+    pub battery_percent: Option<u8>,
+    pub message: String,
+    pub troubleshooting_steps: Vec<String>,
 }
 
 struct ActiveSocket {

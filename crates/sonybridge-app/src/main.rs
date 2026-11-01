@@ -9,7 +9,8 @@ use sonybridge_core::protocol::MdrFrame;
 use sonybridge_core::state::{ConnectionStatus, HeadphoneState, StateMachine};
 use sonybridge_core::transport::Transport;
 use sonybridge_windows::{
-    AudioEndpointSanitizer, AutostartManager, WinRtRfcommTransport, WindowsBluetoothManager,
+    AudioEndpointSanitizer, AutostartManager, ConnectionDiagnostics, WinRtRfcommTransport,
+    WindowsBluetoothManager,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -311,69 +312,118 @@ fn run_diagnostic_probe_in_terminal() -> CommandResult {
 }
 
 #[tauri::command]
-async fn trigger_reconnect(state: State<'_, AppState>) -> Result<CommandResult, String> {
-    tracing::info!("Scanning for paired Sony headphones...");
-    let devices = WindowsBluetoothManager::discover_paired_sony_devices()
-        .await
-        .map_err(|e| e.to_string())?;
-
-    if let Some(device) = devices.first() {
-        let mac_str = format!("{:012X}", device.mac_address);
-        tracing::info!(
-            name = %device.name,
-            mac = %mac_str,
-            connected = device.is_connected,
-            "Discovered paired Sony headphone"
-        );
-
-        let mut transport = WinRtRfcommTransport::with_mac(&device.name, device.mac_address);
-        let rfcomm_ok = transport.connect().await.is_ok();
-        let mut wire_hex = None;
-
-        if rfcomm_ok {
-            let query = MdrFrame::new(0, commands::build_v1_battery_query()).encode_wire();
-            let _ = transport.send(&query).await;
-            wire_hex = Some(format_hex(&query));
-        }
-
-        {
-            let mut sm = state.state_machine.lock().unwrap();
-            sm.state.device_name = Some(device.name.clone());
-            sm.state.mac_address = Some(mac_str.clone());
-            sm.state.model = Some(HeadphoneModel::from_device_name(&device.name));
-            sm.state.status = if rfcomm_ok || device.is_connected {
-                ConnectionStatus::Connected
-            } else {
-                ConnectionStatus::Disconnected
-            };
-        }
-
-        {
-            let mut guard = state.transport.lock().await;
-            *guard = if rfcomm_ok { Some(transport) } else { None };
-        }
-
-        // Auto-enforce Stereo A2DP if configured
-        let should_enforce = state.config.lock().unwrap().enforce_a2dp_on_connect;
-        if should_enforce {
-            let _ = AudioEndpointSanitizer::enforce_stereo_a2dp();
-        }
-
-        Ok(CommandResult {
-            status: "ok".to_string(),
-            message: Some(format!("Connected to {} ({})", device.name, mac_str)),
-            wire_hex,
-        })
-    } else {
-        Ok(CommandResult {
-            status: "standby".to_string(),
-            message: Some(
-                "No paired Sony WH-1000XM3 detected yet (Demo / Simulation Mode active)"
-                    .to_string(),
-            ),
-            wire_hex: None,
-        })
+async fn get_connection_diagnostics(
+    state: State<'_, AppState>,
+) -> Result<ConnectionDiagnostics, String> {
+    let mut diag = WindowsBluetoothManager::run_connection_diagnostics().await;
+    let sm = state.state_machine.lock().unwrap();
+    if diag.is_connected {
+        diag.battery_percent = Some(sm.state.battery.percentage);
     }
+    Ok(diag)
+}
+
+#[tauri::command]
+fn open_windows_settings(page: String) -> CommandResult {
+    let uri = match page.as_str() {
+        "bluetooth" => "ms-settings:bluetooth",
+        "sound" => "ms-settings:sound",
+        _ => "ms-settings:devices",
+    };
+    let _ = std::process::Command::new("explorer").arg(uri).spawn();
+    CommandResult {
+        status: "ok".to_string(),
+        message: Some(format!("Opened {uri}")),
+        wire_hex: None,
+    }
+}
+
+#[tauri::command]
+async fn trigger_reconnect(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> Result<CommandResult, String> {
+    tracing::info!("Scanning for paired Sony headphones...");
+    let diag = WindowsBluetoothManager::run_connection_diagnostics().await;
+
+    if diag.status == "connected" {
+        let devices = WindowsBluetoothManager::discover_paired_sony_devices()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        if let Some(device) = devices.first() {
+            let mac_str = format!("{:012X}", device.mac_address);
+            tracing::info!(
+                name = %device.name,
+                mac = %mac_str,
+                connected = device.is_connected,
+                "Discovered paired Sony headphone"
+            );
+
+            let mut transport = WinRtRfcommTransport::with_mac(&device.name, device.mac_address);
+            let rfcomm_ok = transport.connect().await.is_ok();
+            let mut wire_hex = None;
+
+            if rfcomm_ok {
+                let query = MdrFrame::new(0, commands::build_v1_battery_query()).encode_wire();
+                let _ = transport.send(&query).await;
+                wire_hex = Some(format_hex(&query));
+            }
+
+            {
+                let mut sm = state.state_machine.lock().unwrap();
+                sm.state.device_name = Some(device.name.clone());
+                sm.state.mac_address = Some(mac_str.clone());
+                sm.state.model = Some(HeadphoneModel::from_device_name(&device.name));
+                sm.state.status = if rfcomm_ok || device.is_connected {
+                    ConnectionStatus::Connected
+                } else {
+                    ConnectionStatus::Disconnected
+                };
+            }
+
+            {
+                let mut guard = state.transport.lock().await;
+                *guard = if rfcomm_ok { Some(transport) } else { None };
+            }
+
+            // Auto-enforce Stereo A2DP if configured
+            let should_enforce = state.config.lock().unwrap().enforce_a2dp_on_connect;
+            if should_enforce {
+                let _ = AudioEndpointSanitizer::enforce_stereo_a2dp();
+            }
+
+            if let Some(tray) = app.tray_by_id("main_tray") {
+                let _ = tray.set_tooltip(Some(format!("SonyBridge — {} (Connected)", device.name)));
+            }
+
+            return Ok(CommandResult {
+                status: "ok".to_string(),
+                message: Some(format!("Connected to {} ({})", device.name, mac_str)),
+                wire_hex,
+            });
+        }
+    }
+
+    // Disconnected / BLE only / Not paired
+    {
+        let mut sm = state.state_machine.lock().unwrap();
+        sm.state.status = ConnectionStatus::Disconnected;
+    }
+    {
+        let mut guard = state.transport.lock().await;
+        *guard = None;
+    }
+
+    if let Some(tray) = app.tray_by_id("main_tray") {
+        let _ = tray.set_tooltip(Some("SonyBridge — Disconnected".to_string()));
+    }
+
+    Ok(CommandResult {
+        status: diag.status,
+        message: Some(diag.message),
+        wire_hex: None,
+    })
 }
 
 #[tauri::command]
@@ -579,6 +629,8 @@ fn main() {
             set_equalizer,
             apply_sound_profile,
             trigger_reconnect,
+            get_connection_diagnostics,
+            open_windows_settings,
             enforce_a2dp,
             set_touch_sensor,
             set_auto_off,
@@ -589,7 +641,7 @@ fn main() {
         ])
         .setup(|app| {
             // Build Context Menu for System Tray
-            let header_item = MenuItemBuilder::with_id("header", "Sony WH-1000XM3 — 85% (ANC On)")
+            let header_item = MenuItemBuilder::with_id("header", "SonyBridge — Ready")
                 .enabled(false)
                 .build(app)?;
             let profile_focus =
@@ -619,7 +671,7 @@ fn main() {
 
             // Build System Tray Icon with unique ID for dynamic telemetry updates
             let _tray = TrayIconBuilder::with_id("main_tray")
-                .tooltip("SonyBridge — WH-1000XM3 (85% • ANC On)")
+                .tooltip("SonyBridge — Desktop Companion")
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {

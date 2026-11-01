@@ -96,13 +96,22 @@ if (-not $SourceDir) {
     throw "sonybridge-app.exe was not found in $ScriptDir or target\release. Please build the workspace or run from an extracted release package."
 }
 
-$Version = "0.2.0"
-$CargoToml = Join-Path $ScriptDir "..\Cargo.toml"
-if (Test-Path $CargoToml) {
-    $content = Get-Content $CargoToml -Raw
-    if ($content -match '\[workspace\.package\][\s\S]*?version\s*=\s*"([^"]+)"') {
-        $Version = $matches[1].Trim()
+$Version = "0.3.0"
+$CandidateCargo = @(
+    (Join-Path $ScriptDir "..\Cargo.toml"),
+    (Join-Path $ScriptDir "..\..\Cargo.toml")
+)
+foreach ($c in $CandidateCargo) {
+    if (Test-Path $c) {
+        $content = Get-Content $c -Raw
+        if ($content -match '\[workspace\.package\][\s\S]*?version\s*=\s*"([^"]+)"') {
+            $Version = $matches[1].Trim()
+            break
+        }
     }
+}
+if ($ScriptDir -match 'v(\d+\.\d+\.\d+)') {
+    $Version = $matches[1]
 }
 
 # -----------------------------------------------------------------------------
@@ -360,7 +369,7 @@ $lblTitle.AutoSize = $true
 $pnlHeader.Controls.Add($lblTitle)
 
 $lblSubtitle = New-Object System.Windows.Forms.Label
-$lblSubtitle.Text = "Sony WH-1000XM3 / XM4 / XM5 Companion for Windows 10 & 11  •  v$Version"
+$lblSubtitle.Text = "Sony WH-1000XM3 / XM4 / XM5 Companion for Windows 10 & 11  |  v$Version"
 $lblSubtitle.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
 $lblSubtitle.ForeColor = [System.Drawing.Color]::FromArgb(180, 195, 215)
 $lblSubtitle.Location = New-Object System.Drawing.Point(24, 40)
@@ -430,12 +439,12 @@ This wizard will guide you through setting up SonyBridge on your computer.
 
 SonyBridge brings the full functionality of the Sony | Headphones Connect app to Windows 10 & 11 for the WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series:
 
-  • Active Noise Canceling & Ambient Sound: Dual NC, Wind Reduction, 20-step Ambient + Voice Focus
-  • Hardware 5-Band Equalizer & Clear Bass: Direct DSP tuning (-10 to +10 dB)
-  • 1-Click Sound Profiles: Focus, Office/Calls, Cinema/Bass Boost, and Studio Reference
-  • Smart Windows A2DP Audio Routing: Eliminates muffled Hands-Free AG Audio degradation
-  • Real-Time Battery & Protocol Wire Inspector: Authentic Sony MDR v1/v2 RFCOMM framing
-  • Zero Elevation Required: Installs cleanly in user space with 0% idle CPU
+  * Active Noise Canceling & Ambient Sound: Dual NC, Wind Reduction, 20-step Ambient + Voice Focus
+  * Hardware 5-Band Equalizer & Clear Bass: Direct DSP tuning (-10 to +10 dB)
+  * 1-Click Sound Profiles: Focus, Office/Calls, Cinema/Bass Boost, and Studio Reference
+  * Smart Windows A2DP Audio Routing: Eliminates muffled Hands-Free AG Audio degradation
+  * Real-Time Battery & Protocol Wire Inspector: Authentic Sony MDR v1/v2 RFCOMM framing
+  * Zero Elevation Required: Installs cleanly in user space with 0% idle CPU
 
 Click Next to select your installation preferences.
 "@
@@ -634,9 +643,9 @@ SonyBridge has been successfully installed on your computer.
 Your Sony WH-1000XM3 / XM4 / XM5 system tray companion and diagnostic CLI are configured and ready.
 
 Installation Details:
- • Installed to: $($txtTargetDir.Text)
- • Configuration directory: %APPDATA%\SonyBridge
- • Registered in Windows Installed Apps (Add/Remove Programs)
+ - Installed to: $($txtTargetDir.Text)
+ - Configuration directory: %APPDATA%\SonyBridge
+ - Registered in Windows Installed Apps (Add/Remove Programs)
 
 Click Finish to complete the setup.
 "@

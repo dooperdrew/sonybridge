@@ -12,7 +12,9 @@ pub mod probe;
 
 pub use audio::{AudioEndpoint, AudioEndpointSanitizer};
 pub use autostart::AutostartManager;
-pub use bluetooth::{DiscoveredDevice, WinRtRfcommTransport, WindowsBluetoothManager};
+pub use bluetooth::{
+    ConnectionDiagnostics, DiscoveredDevice, WinRtRfcommTransport, WindowsBluetoothManager,
+};
 pub use probe::run_diagnostic_probe;
 
 /// Attaches to the parent process console (e.g. PowerShell or cmd) so CLI output is displayed

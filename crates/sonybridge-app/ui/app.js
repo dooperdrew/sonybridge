@@ -331,19 +331,156 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Diagnostics & Live Connection Management
+  const connectionPill = document.getElementById("connection-pill");
+  const statusDot = document.getElementById("status-dot");
+  const connectionText = document.getElementById("connection-text");
+  const batteryPct = document.getElementById("battery-pct");
+  const batteryFill = document.getElementById("battery-fill");
+  const batteryStatus = document.getElementById("battery-status");
+  const connectionBanner = document.getElementById("connection-banner");
+  const bannerTitle = document.getElementById("banner-title");
+  const bannerBody = document.getElementById("banner-body");
+  const bannerSteps = document.getElementById("banner-steps");
+  const diagSummary = document.getElementById("diag-summary");
+
+  function applyDiagnostics(diag) {
+    if (!diag) return;
+
+    statusDot.className = "status-dot";
+    if (diag.status === "connected") {
+      statusDot.classList.add("connected");
+      connectionText.textContent = "Connected";
+      if (batteryStatus) {
+        batteryStatus.textContent = diag.message || "Bluetooth Stereo A2DP • Active";
+      }
+      if (diag.battery_percent) {
+        if (batteryPct) batteryPct.textContent = `${diag.battery_percent}%`;
+        if (batteryFill) batteryFill.style.width = `${diag.battery_percent}%`;
+      }
+      if (connectionBanner) connectionBanner.style.display = "none";
+      if (diagSummary) {
+        diagSummary.textContent = `Connected: ${diag.device_name || "Sony Headphones"} (${diag.mac_address || "A2DP/RFCOMM"})`;
+        diagSummary.style.color = "var(--green)";
+      }
+    } else if (diag.status === "ble_only") {
+      statusDot.classList.add("ble-only");
+      connectionText.textContent = "BLE Only (Audio Disconnected)";
+      if (batteryPct) batteryPct.textContent = "--";
+      if (batteryFill) batteryFill.style.width = "0%";
+      if (batteryStatus) batteryStatus.textContent = "LE Beacon Paired • Audio Not Connected";
+
+      if (connectionBanner) {
+        connectionBanner.className = "connection-banner";
+        connectionBanner.style.display = "flex";
+        if (bannerTitle) bannerTitle.textContent = `Bluetooth Low Energy (${diag.ble_device_name || "LE_WH-1000XM3"}) Detected`;
+        if (bannerBody) {
+          bannerBody.textContent = "Windows is paired to the Bluetooth Low Energy beacon only. In this mode, no audio is played and Sony MDR headphone controls cannot connect.";
+        }
+        if (bannerSteps) {
+          bannerSteps.innerHTML = "";
+          (diag.troubleshooting_steps || [
+            "Turn headphones off.",
+            "Hold Power button for 7 seconds until you hear 'Bluetooth pairing'.",
+            "Open Windows Settings and pair 'WH-1000XM3' (headphone icon, NOT LE_).",
+            "Click 'Re-Scan Bluetooth'."
+          ]).forEach(step => {
+            const li = document.createElement("li");
+            li.textContent = step;
+            bannerSteps.appendChild(li);
+          });
+        }
+      }
+      if (diagSummary) {
+        diagSummary.textContent = `Notice: ${diag.message}`;
+        diagSummary.style.color = "#fbbf24";
+      }
+    } else {
+      statusDot.classList.add("disconnected");
+      connectionText.textContent = "Disconnected";
+      if (batteryPct) batteryPct.textContent = "--";
+      if (batteryFill) batteryFill.style.width = "0%";
+      if (batteryStatus) batteryStatus.textContent = "No Sony Audio Device Active";
+
+      if (connectionBanner) {
+        connectionBanner.className = "connection-banner error";
+        connectionBanner.style.display = "flex";
+        if (bannerTitle) bannerTitle.textContent = "Sony Headphones Disconnected";
+        if (bannerBody) {
+          bannerBody.textContent = diag.message || "No active Sony Bluetooth audio connection found.";
+        }
+        if (bannerSteps) {
+          bannerSteps.innerHTML = "";
+          (diag.troubleshooting_steps || [
+            "Ensure headphones are powered on and within Bluetooth range.",
+            "If not paired yet, put headphones in pairing mode (hold Power for 7s).",
+            "Pair in Windows Settings > Bluetooth & devices.",
+            "Click 'Re-Scan Bluetooth'."
+          ]).forEach(step => {
+            const li = document.createElement("li");
+            li.textContent = step;
+            bannerSteps.appendChild(li);
+          });
+        }
+      }
+      if (diagSummary) {
+        diagSummary.textContent = `Status: ${diag.message}`;
+        diagSummary.style.color = "#f87171";
+      }
+    }
+  }
+
+  function refreshDiagnostics() {
+    invoke("get_connection_diagnostics").then(applyDiagnostics).catch(console.error);
+  }
+
+  // Initial scan immediately on startup
+  refreshDiagnostics();
+  // Periodic poll every 5 seconds for live status changes
+  setInterval(refreshDiagnostics, 5000);
+
+  // Settings & Banner Navigation Buttons
+  const openBtSettings = () => invoke("open_windows_settings", { page: "bluetooth" }).catch(console.error);
+  const openSoundSettings = () => invoke("open_windows_settings", { page: "sound" }).catch(console.error);
+
+  const btnBannerBt = document.getElementById("btn-banner-bluetooth");
+  if (btnBannerBt) btnBannerBt.addEventListener("click", openBtSettings);
+
+  const btnOpenBtSettings = document.getElementById("btn-open-bt-settings");
+  if (btnOpenBtSettings) btnOpenBtSettings.addEventListener("click", openBtSettings);
+
+  const btnBannerSound = document.getElementById("btn-banner-sound");
+  if (btnBannerSound) btnBannerSound.addEventListener("click", openSoundSettings);
+
+  const btnOpenSoundSettings = document.getElementById("btn-open-sound-settings");
+  if (btnOpenSoundSettings) btnOpenSoundSettings.addEventListener("click", openSoundSettings);
+
+  const btnRunDiag = document.getElementById("btn-run-diag");
+  if (btnRunDiag) btnRunDiag.addEventListener("click", refreshDiagnostics);
+
+  const btnBannerReconnect = document.getElementById("btn-banner-reconnect");
+  if (btnBannerReconnect) {
+    btnBannerReconnect.addEventListener("click", () => {
+      btnBannerReconnect.textContent = "Scanning...";
+      invoke("trigger_reconnect").then((res) => {
+        refreshDiagnostics();
+        btnBannerReconnect.textContent = "Re-Scan Bluetooth";
+      }).catch(() => {
+        refreshDiagnostics();
+        btnBannerReconnect.textContent = "Re-Scan Bluetooth";
+      });
+    });
+  }
+
   // Reconnect & Audio Enforce Buttons
   document.getElementById("btn-reconnect").addEventListener("click", () => {
-    const pillText = document.getElementById("connection-text");
-    pillText.textContent = "Scanning...";
+    connectionText.textContent = "Scanning...";
     invoke("trigger_reconnect").then((res) => {
       updateWireConsole(res);
-      pillText.textContent = res && res.status === "ok" ? "Connected" : "Ready (Standby)";
-      if (res && res.message) {
-        document.getElementById("battery-status").textContent = res.message;
-      }
+      refreshDiagnostics();
     }).catch(err => {
       console.error(err);
-      pillText.textContent = "Standby";
+      refreshDiagnostics();
     });
   });
 

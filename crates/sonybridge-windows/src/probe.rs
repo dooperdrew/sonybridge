@@ -14,8 +14,22 @@ pub async fn run_diagnostic_probe() {
     match WindowsBluetoothManager::discover_paired_sony_devices().await {
         Ok(devices) => {
             if devices.is_empty() {
-                println!("  -> No paired Sony headphones detected.");
-                println!("  -> Tip: Ensure your WH-1000XM3 is paired in Windows Settings.");
+                println!("  -> No paired Classic Bluetooth Sony audio headphones detected.");
+                // Check if BLE beacon was paired instead
+                if let Ok(ble_devices) =
+                    WindowsBluetoothManager::discover_paired_sony_ble_devices().await
+                {
+                    if let Some(ble_name) = ble_devices.first() {
+                        println!("  -> [!] Detected paired BLE beacon: '{ble_name}'");
+                        println!("  -> [!] IMPORTANT: '{ble_name}' is Bluetooth Low Energy only (no audio / no RFCOMM).");
+                        println!("  -> [!] Remedy: Put headphones in pairing mode (hold Power for 7s until 'Bluetooth pairing')");
+                        println!("         and select 'WH-1000XM3' (headphone icon, NOT LE_) in Windows Settings.");
+                    } else {
+                        println!("  -> Tip: Ensure your WH-1000XM3 is paired in Windows Settings.");
+                    }
+                } else {
+                    println!("  -> Tip: Ensure your WH-1000XM3 is paired in Windows Settings.");
+                }
             } else {
                 println!("  -> Found {} paired device(s):", devices.len());
                 for d in &devices {
