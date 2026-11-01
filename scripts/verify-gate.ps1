@@ -31,7 +31,9 @@ param(
     [ValidateSet("Auto", "Rust", "Node", "Python", "Go", "Template")]
     [string]$Stack = "Auto",
 
-    [switch]$SkipBuild
+    [switch]$SkipBuild,
+
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
@@ -85,6 +87,10 @@ $FailedStages = @()
 
 function Invoke-Stage([string]$StageName, [scriptblock]$Action) {
     Write-Host "`n>> Stage: $StageName" -ForegroundColor Yellow
+    if ($DryRun) {
+        Write-Host "   [DRY-RUN] Stage planned for execution." -ForegroundColor Gray
+        return
+    }
     $StageWatch = [System.Diagnostics.Stopwatch]::StartNew()
     try {
         & $Action
@@ -243,6 +249,24 @@ switch ($Stack) {
             foreach ($doc in $RequiredDocs) {
                 if (-not (Test-Path (Join-Path $RepoRoot $doc))) {
                     throw "Missing required documentation contract: $doc"
+                }
+            }
+
+            # Markdown Link Integrity Audit
+            $MdFiles = Get-ChildItem -Path $RepoRoot -Recurse -Filter "*.md" | Where-Object { $_.FullName -notmatch '\\\.git\\' -and $_.FullName -notmatch '\\\.worktrees\\' }
+            $LinkRegex = [regex]'\[([^\]]+)\]\((?!https?:|#|conversation:|mailto:)([^\)]+)\)'
+            foreach ($File in $MdFiles) {
+                $Content = Get-Content $File.FullName -Raw -Encoding utf8
+                $LinkMatches = $LinkRegex.Matches($Content)
+                foreach ($m in $LinkMatches) {
+                    $RawTarget = $m.Groups[2].Value.Split("#")[0].Trim()
+                    if (-not [string]::IsNullOrWhiteSpace($RawTarget)) {
+                        $TargetClean = $RawTarget.Replace("/", "\")
+                        $Resolved = [System.IO.Path]::GetFullPath((Join-Path $File.DirectoryName $TargetClean))
+                        if (-not (Test-Path $Resolved)) {
+                            throw "Broken markdown link in $($File.Name): '$RawTarget' (target not found)"
+                        }
+                    }
                 }
             }
         }
