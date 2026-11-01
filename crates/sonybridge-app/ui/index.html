@@ -34,6 +34,7 @@
           <option value="en">EN</option>
           <option value="it">IT</option>
         </select>
+        <button class="btn btn-secondary btn-sm" id="btn-open-pairing" title="Open Guided Headphone Pairing Assistant">Pair Headphones</button>
         <button class="btn btn-secondary btn-sm" id="btn-open-wizard" title="Open Setup Guide">Wizard</button>
         <div class="connection-pill" id="connection-pill">
           <span class="status-dot standby" id="status-dot"></span>
@@ -70,7 +71,8 @@
       <div class="banner-body" id="banner-body"></div>
       <ol class="banner-steps" id="banner-steps"></ol>
       <div class="banner-actions">
-        <button class="btn btn-primary btn-sm" id="btn-banner-bluetooth">Open Windows Bluetooth Settings</button>
+        <button class="btn btn-primary btn-sm" id="btn-banner-pair">Pairing Assistant</button>
+        <button class="btn btn-secondary btn-sm" id="btn-banner-bluetooth">Open Windows Bluetooth Settings</button>
         <button class="btn btn-secondary btn-sm" id="btn-banner-sound">Open Sound Settings</button>
         <button class="btn btn-secondary btn-sm" id="btn-banner-reconnect">Re-Scan Bluetooth</button>
       </div>
@@ -253,9 +255,10 @@
               <div id="diag-summary" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Status: Checking environment...</div>
             </div>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="btn-tab-pair">Pairing Assistant</button>
               <button class="btn btn-secondary btn-sm" id="btn-open-bt-settings">Bluetooth Settings</button>
               <button class="btn btn-secondary btn-sm" id="btn-open-sound-settings">Sound Settings</button>
-              <button class="btn btn-primary btn-sm" id="btn-run-diag">Run Diagnostic</button>
+              <button class="btn btn-secondary btn-sm" id="btn-run-diag">Run Diagnostic</button>
             </div>
           </div>
 
@@ -358,6 +361,61 @@
         </div>
         <div class="modal-actions">
           <button class="btn btn-primary" id="btn-finish-onboarding">Get Started & Scan Headphones</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guided Headphone Pairing Assistant Modal -->
+    <div class="modal-backdrop" id="modal-pairing-assistant" style="display: none;">
+      <div class="modal-card" style="max-width: 580px;">
+        <div class="modal-header">
+          <h2>Pair Sony Headphones with Windows</h2>
+          <span class="ver-badge">Pairing Assistant</span>
+          <button class="btn-close" id="btn-close-pairing" aria-label="Close Pairing Assistant" title="Close Pairing Assistant">&times;</button>
+        </div>
+        <p class="modal-intro">
+          Follow these 3 steps to pair your headphones for high-resolution Stereo Audio and SonyBridge companion controls.
+        </p>
+
+        <div class="wizard-steps">
+          <div class="wizard-step" id="pairing-step-1">
+            <div class="step-num">1</div>
+            <div>
+              <h4>Put Headphones into Bluetooth Pairing Mode</h4>
+              <p>Turn the headphones <strong>OFF</strong>. Then press and hold the <strong>Power</strong> button for <strong>7 seconds</strong> until you hear <em>"Bluetooth pairing"</em> and the blue indicator LED flashes rapidly in pairs.</p>
+            </div>
+          </div>
+
+          <div class="wizard-step" id="pairing-step-2">
+            <div class="step-num">2</div>
+            <div>
+              <h4>Launch Windows Bluetooth Pairing</h4>
+              <p>Click below to open the native Windows pairing dialog:</p>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" id="btn-launch-device-wizard">Launch Windows Pairing Wizard</button>
+                <button class="btn btn-secondary btn-sm" id="btn-launch-add-device">Open Windows Add Device</button>
+              </div>
+              <div class="warning-callout" style="background: rgba(245, 158, 11, 0.12); border-left: 3px solid #f59e0b; padding: 0.6rem 0.8rem; margin-top: 0.6rem; border-radius: 4px; font-size: 0.82rem; color: #fbbf24;">
+                <strong>⚠️ CRITICAL:</strong> In the device list, select <strong>WH-1000XM3</strong> with the <strong>Headphone icon</strong>. Do <em>NOT</em> select <em>LE_WH-1000XM3</em> (the LE prefix is beacon-only with no sound).
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-step" id="pairing-step-3">
+            <div class="step-num">3</div>
+            <div>
+              <h4>Automatic Detection & Link</h4>
+              <p id="pairing-status-text">SonyBridge is actively scanning for your headphones...</p>
+              <div class="pairing-live-indicator" id="pairing-live-indicator" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; font-size: 0.85rem; color: var(--accent-gold);">
+                <span class="status-dot standby" id="pairing-live-dot"></span> <span id="pairing-live-desc">Searching for paired Classic Bluetooth device...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <button class="btn btn-secondary btn-sm" id="btn-pairing-open-settings">Open Bluetooth Settings</button>
+          <button class="btn btn-primary" id="btn-finish-pairing">Done</button>
         </div>
       </div>
     </div>

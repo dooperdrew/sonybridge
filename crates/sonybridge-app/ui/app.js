@@ -534,5 +534,99 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Guided Headphone Pairing Assistant
+  const pairingModal = document.getElementById("modal-pairing-assistant");
+  const btnOpenPairing = document.getElementById("btn-open-pairing");
+  const btnBannerPair = document.getElementById("btn-banner-pair");
+  const btnTabPair = document.getElementById("btn-tab-pair");
+  const btnClosePairing = document.getElementById("btn-close-pairing");
+  const btnFinishPairing = document.getElementById("btn-finish-pairing");
+  const btnLaunchDeviceWizard = document.getElementById("btn-launch-device-wizard");
+  const btnLaunchAddDevice = document.getElementById("btn-launch-add-device");
+  const btnPairingOpenSettings = document.getElementById("btn-pairing-open-settings");
+  const pairingLiveDot = document.getElementById("pairing-live-dot");
+  const pairingLiveDesc = document.getElementById("pairing-live-desc");
+  const pairingStatusText = document.getElementById("pairing-status-text");
+
+  let pairingInterval = null;
+
+  function showPairingModal() {
+    if (pairingModal) {
+      pairingModal.style.display = "flex";
+      startPairingLiveWatch();
+    }
+  }
+
+  function hidePairingModal() {
+    if (pairingModal) {
+      pairingModal.style.display = "none";
+      if (pairingInterval) {
+        clearInterval(pairingInterval);
+        pairingInterval = null;
+      }
+    }
+  }
+
+  function startPairingLiveWatch() {
+    if (pairingInterval) clearInterval(pairingInterval);
+    const check = () => {
+      invoke("get_connection_diagnostics").then((diag) => {
+        applyDiagnostics(diag);
+        if (diag && diag.status === "connected") {
+          if (pairingLiveDot) {
+            pairingLiveDot.className = "status-dot connected";
+          }
+          if (pairingLiveDesc) {
+            pairingLiveDesc.textContent = `Success! Connected to ${diag.device_name || "WH-1000XM3"}`;
+            pairingLiveDesc.style.color = "var(--green)";
+          }
+          if (pairingStatusText) {
+            pairingStatusText.textContent = "Your headphones are paired, connected, and active in Windows!";
+          }
+        } else if (diag && diag.status === "ble_only") {
+          if (pairingLiveDot) {
+            pairingLiveDot.className = "status-dot ble-only";
+          }
+          if (pairingLiveDesc) {
+            pairingLiveDesc.textContent = "Found 'LE_WH-1000XM3'. Waiting for 'WH-1000XM3' Audio...";
+            pairingLiveDesc.style.color = "#fbbf24";
+          }
+        } else {
+          if (pairingLiveDot) {
+            pairingLiveDot.className = "status-dot standby";
+          }
+          if (pairingLiveDesc) {
+            pairingLiveDesc.textContent = "Scanning for discoverable WH-1000XM3...";
+            pairingLiveDesc.style.color = "var(--accent-gold)";
+          }
+        }
+      }).catch(console.error);
+    };
+    check();
+    pairingInterval = setInterval(check, 2000);
+  }
+
+  if (btnOpenPairing) btnOpenPairing.addEventListener("click", showPairingModal);
+  if (btnBannerPair) btnBannerPair.addEventListener("click", showPairingModal);
+  if (btnTabPair) btnTabPair.addEventListener("click", showPairingModal);
+  if (btnClosePairing) btnClosePairing.addEventListener("click", hidePairingModal);
+  if (btnFinishPairing) btnFinishPairing.addEventListener("click", hidePairingModal);
+
+  if (btnLaunchDeviceWizard) {
+    btnLaunchDeviceWizard.addEventListener("click", () => {
+      invoke("launch_pairing_wizard").catch(console.error);
+    });
+  }
+
+  if (btnLaunchAddDevice) {
+    btnLaunchAddDevice.addEventListener("click", () => {
+      invoke("open_add_device_flyout").catch(console.error);
+    });
+  }
+
+  if (btnPairingOpenSettings) {
+    btnPairingOpenSettings.addEventListener("click", openBtSettings);
+  }
+
   updateEqLabels();
 });

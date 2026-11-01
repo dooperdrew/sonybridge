@@ -339,6 +339,33 @@ fn open_windows_settings(page: String) -> CommandResult {
 }
 
 #[tauri::command]
+fn launch_pairing_wizard() -> CommandResult {
+    let status = std::process::Command::new("DevicePairingWizard.exe").spawn();
+    if status.is_err() {
+        let _ = std::process::Command::new("explorer")
+            .arg("ms-settings-connectabledevices:devicediscovery")
+            .spawn();
+    }
+    CommandResult {
+        status: "ok".to_string(),
+        message: Some("Launched Windows Device Pairing Wizard".to_string()),
+        wire_hex: None,
+    }
+}
+
+#[tauri::command]
+fn open_add_device_flyout() -> CommandResult {
+    let _ = std::process::Command::new("explorer")
+        .arg("ms-settings-connectabledevices:devicediscovery")
+        .spawn();
+    CommandResult {
+        status: "ok".to_string(),
+        message: Some("Opened Windows Add Device flyout".to_string()),
+        wire_hex: None,
+    }
+}
+
+#[tauri::command]
 async fn trigger_reconnect(
     app: tauri::AppHandle,
     state: State<'_, AppState>,
@@ -631,6 +658,8 @@ fn main() {
             trigger_reconnect,
             get_connection_diagnostics,
             open_windows_settings,
+            launch_pairing_wizard,
+            open_add_device_flyout,
             enforce_a2dp,
             set_touch_sensor,
             set_auto_off,
