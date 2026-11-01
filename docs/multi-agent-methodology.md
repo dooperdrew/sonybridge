@@ -70,9 +70,27 @@ In a multi-agent environment, having multiple agents write directly to the same 
 
 ### Protocol Invariants:
 1. **Single Committer:** Only the Lead Agent (the interactive Antigravity session with the user) is authorized to run `git commit`, `git push`, edit git remotes, publish GitHub Releases, or close GitHub issues.
-2. **Local Worktree Isolation:** Worker subagents run in isolated workspace branches (via `Workspace: "branch"`). They touch only the files assigned to their ownership boundary.
+2. **Local Worktree Isolation (`scripts/manage-worktree.ps1`):** Worker subagents run in isolated workspace branches (via `Workspace: "branch"` or git worktrees under `.worktrees/<task-id>`). They touch only the files assigned to their ownership boundary.
 3. **Zero Direct Main Commits:** Worker subagents and cloud agents are strictly forbidden from committing directly to `main` or merging pull requests.
 4. **Disjoint File Ownership:** Parallel tasks must operate on disjoint crates/files. Cross-module dependencies are resolved sequentially or behind stable traits (`RfcommTransport`).
+5. **Tiered Verification Gate (`scripts/verify-gate.ps1`):**
+   - **Fast Mode (`-Mode Fast`):** Fast formatting, clippy on modified targets, and targeted unit tests with parallel runners (`--test-threads`).
+   - **Full Mode (`-Mode Full`):** Comprehensive gate with full clean compilation, integration tests, and release build audit. Required before merging or releasing.
+
+### Worktree Automation Commands:
+```powershell
+# 1. Spawn isolated parallel worktree for a task:
+powershell -ExecutionPolicy Bypass -File .\scripts\manage-worktree.ps1 -Action New -Task "M1.1"
+
+# 2. Run fast incremental gate inside the worktree:
+powershell -ExecutionPolicy Bypass -File .\scripts\manage-worktree.ps1 -Action Gate -Task "M1.1" -Mode Fast
+
+# 3. Merge verified branch into main (Sole Committer):
+powershell -ExecutionPolicy Bypass -File .\scripts\manage-worktree.ps1 -Action Merge -Task "M1.1"
+
+# 4. Clean up worktree:
+powershell -ExecutionPolicy Bypass -File .\scripts\manage-worktree.ps1 -Action Remove -Task "M1.1"
+```
 
 ---
 

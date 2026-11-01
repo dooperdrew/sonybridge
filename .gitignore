@@ -17,7 +17,11 @@ $RECYCLE.BIN/
 
 # QA test artifacts
 /qa-output/
+/qa-screenshots/
 qa-reports/**/screenshots/
+
+# Local Git Worktrees
+.worktrees/
 
 # IDE & Editor files
 .vscode/

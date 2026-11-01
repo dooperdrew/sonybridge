@@ -39,20 +39,22 @@ Whenever the user corrects, redirects, or clarifies a requirement:
 
 Fallback order: `inherit` → `pro` → `flash` → `flash_lite`. Every fallback **must** be logged in `docs/model-fallback-log.md`, and an audit task for it goes into the hardening milestone.
 
-## 6. Task lifecycle
-- **Before:** find the task in `docs/05-roadmap.md`, restate the task + tier + target files + acceptance criteria, and check that `git status` is clean. Ensure toolchain PATH is initialized (PowerShell: `$env:USERPROFILE\.cargo\bin`).
-- **During:** respect the hard rules (§7). Unverified assumptions are marked 🔬 and probed, not guessed. Decouple headless tests from physical QA (keep manual QA as Pending).
-- **Draft PR Review (for Copilot / Worker tasks):** Lead pulls branch locally, runs the full verification gate, inspects diff for ownership and safety invariants, refines if needed, merges to `main`, and closes the corresponding issue.
-- **Gate (must pass before finishing):**
+## 6. Task lifecycle & Tiered Verification Gate
+- **Before:** find the task in `docs/05-roadmap.md`, restate the task + tier + target files + acceptance criteria, and check that `git status` is clean. For parallel tasks, spawn an isolated branch or worktree (`powershell -ExecutionPolicy Bypass -File .\scripts\manage-worktree.ps1 -Action New -Task <id>`). Ensure toolchain PATH is initialized (PowerShell: `$env:USERPROFILE\.cargo\bin`).
+- **During:** respect the hard rules (§7). Unverified assumptions are marked 🔬 and probed, not guessed. Decouple headless tests from physical QA (keep manual QA as Pending). Workers validate their intermediate changes using the **Fast Gate**:
 ```powershell
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-cargo build --workspace --release
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-gate.ps1 -Mode Fast
+```
+- **Draft PR / Worker Review:** Lead pulls branch or reviews worktree (`powershell -ExecutionPolicy Bypass -File .\scripts\manage-worktree.ps1 -Action Gate -Task <id> -Mode Full`), inspects diff for ownership and safety invariants, refines if needed, merges to `main` via `manage-worktree.ps1 -Action Merge` or GitHub PR, and closes the corresponding issue.
+- **Gate (must pass before finishing / committing to main):**
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-gate.ps1 -Mode Full
 ```
 - **After (lead only):** tick the roadmap box (`(YYYY-MM-DD, <commit>)`), add a CHANGELOG entry, update docs/ADRs if the design changed, add any lesson to `docs/lessons-learned.md`, commit (`M<x>.<y>: <summary>`), push, and update the corresponding GitHub Milestone and Issue. When cutting a release milestone, run `.\scripts\package-release.ps1` and `.\scripts\generate-manifests.ps1` and publish the portable `.zip` archive to GitHub Releases via `gh release create` even while physical hardware QA remains `Pending`.
 
 ## 7. Hard rules
+- **Disjoint File Ownership for Parallel Tasks:** Tasks marked `⇉` MUST define explicit owned files (`crates/<crate>/**`). Workers must never edit files outside their declared ownership boundary. Cross-cutting shared files (e.g. `Cargo.toml`, workspace config) are modified exclusively by the Lead Agent.
+- **Parallel Test Execution & Caching:** Automated test suites must utilize parallel workers to minimize waiting latency (`cargo test --workspace -- --test-threads=auto`). Use build toolchain caching (`sccache`).
 - **GitHub Governance (Milestones, Issues & Releases):** Every roadmap milestone (`M0`..`Mn`) MUST have a corresponding GitHub Milestone and tracked GitHub Issues. Completed tasks close their issue with a commit/release reference; pending hardware QA and future enhancements stay open in their respective milestone. Every release MUST attach a downloadable portable `.zip` bundle (`SonyBridge-vX.Y.Z-windows-x64.zip`) on GitHub Releases so users can download and test without building from source.
 - **Claims follow evidence:** Never claim a test, benchmark, or QA item passed without having run it. Hardware tests on physical headphones (WH-1000XM3) remain `Pending` until confirmed with empirical telemetry or user validation.
 - **Keep claims in docs factual:** Avoid marketing language ("pioneering", "zero bugs") in technical specs while QA is pending.
