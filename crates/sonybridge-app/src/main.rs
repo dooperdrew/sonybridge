@@ -508,16 +508,20 @@ fn main() {
             .ok()
             .and_then(|p| p.parent().map(|d| d.join("setup-wizard.ps1")))
             .unwrap_or_else(|| PathBuf::from("setup-wizard.ps1"));
-        let _ = std::process::Command::new("powershell")
-            .args([
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                &script.to_string_lossy(),
-            ])
-            .spawn();
-        return;
+        if script.exists() {
+            let _ = std::process::Command::new("powershell")
+                .args([
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    &script.to_string_lossy(),
+                ])
+                .spawn();
+            return;
+        }
+        // If setup-wizard.ps1 is not present next to the binary, fall through to launching the GUI directly
+        // so that clicking Setup.exe always opens the application with the onboarding wizard!
     }
 
     // 4. Uninstall mode
@@ -657,8 +661,13 @@ fn main() {
                 })
                 .build(app)?;
 
-            // Prevent app from terminating when main window is closed: hide to tray
+            // Ensure main companion window is shown, centered, and focused on startup
             if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.center();
+                let _ = window.set_focus();
+
                 let win_clone = window.clone();
                 window.on_window_event(move |event| {
                     if let tauri::WindowEvent::CloseRequested { api, .. } = event {

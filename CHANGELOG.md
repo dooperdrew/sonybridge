@@ -5,6 +5,11 @@ All notable changes to **SonyBridge** are documented in this file.
 ## [0.3.0] - 2026-10-31
 
 ### Added (Milestone M12: Single Unified Executable, Dynamic Tray Telemetry & Setup Ergonomics)
+- **Startup Window Guarantee & Setup Fallback**:
+  - Ensured `sonybridge-app.exe` immediately surfaces, centers, and focuses the main desktop window on startup in Tauri v2 rather than remaining hidden in the system tray.
+  - Hardened `SonyBridge-Setup.exe` with automatic fallback to the companion application GUI and onboarding wizard if external PowerShell scripts are absent.
+- **Isolated Per-Version Distribution Staging**:
+  - Enhanced `scripts/package-release.ps1` to produce a clean, isolated `dist/v<Version>/` directory containing all standalone executables, scripts, locales, documentation, and archive bundles for instant testing and distribution.
 - **Single-Binary CLI & Probe Unification (`sonybridge-app`)**:
   - Embedded diagnostic hardware probe (`probe`), A2DP audio routing (`--enforce-a2dp`), and setup/uninstallation switches directly into `sonybridge-app.exe` with parent console attachment (`AttachConsole`).
   - Running without arguments launches the glassmorphic desktop companion as usual.

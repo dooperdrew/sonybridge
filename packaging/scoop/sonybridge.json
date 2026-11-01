@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip",
-            "hash": "c20231fa255226e510a7f0c516e37202150d97d69a55b4f3a6dcb5e85ee6d106"
+            "hash": "acee5b19e65cba19b29fdb1ff959c712049245c30f8bb9e1dfe153b13aa98a40"
         }
     },
     "bin": [
