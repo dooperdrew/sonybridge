@@ -628,5 +628,12 @@ document.addEventListener("DOMContentLoaded", () => {
     btnPairingOpenSettings.addEventListener("click", openBtSettings);
   }
 
+  // Auto-launch pairing modal if requested by installer (--pair)
+  invoke("should_open_pairing_assistant").then((shouldOpen) => {
+    if (shouldOpen) {
+      showPairingModal();
+    }
+  }).catch(console.error);
+
   updateEqLabels();
 });

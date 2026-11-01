@@ -366,6 +366,11 @@ fn open_add_device_flyout() -> CommandResult {
 }
 
 #[tauri::command]
+fn should_open_pairing_assistant() -> bool {
+    std::env::args().any(|a| a == "--pair" || a == "-p" || a == "--pairing")
+}
+
+#[tauri::command]
 async fn trigger_reconnect(
     app: tauri::AppHandle,
     state: State<'_, AppState>,
@@ -660,6 +665,7 @@ fn main() {
             open_windows_settings,
             launch_pairing_wizard,
             open_add_device_flyout,
+            should_open_pairing_assistant,
             enforce_a2dp,
             set_touch_sensor,
             set_auto_off,

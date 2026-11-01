@@ -598,10 +598,41 @@ $pnlFinished.Controls.Add($lblFinBody)
 
 $chkLaunchNow = New-Object System.Windows.Forms.CheckBox
 $chkLaunchNow.Text = "Launch SonyBridge now"
-$chkLaunchNow.Location = New-Object System.Drawing.Point(25, 215)
-$chkLaunchNow.Size = New-Object System.Drawing.Size(450, 24)
+$chkLaunchNow.Location = New-Object System.Drawing.Point(25, 195)
+$chkLaunchNow.Size = New-Object System.Drawing.Size(450, 22)
 $chkLaunchNow.Checked = $ResolvedLaunchOnFinish
 $pnlFinished.Controls.Add($chkLaunchNow)
+
+$chkOpenPairing = New-Object System.Windows.Forms.CheckBox
+$chkOpenPairing.Text = "Launch Guided Headphone Pairing Assistant on startup (recommended)"
+$chkOpenPairing.Location = New-Object System.Drawing.Point(25, 222)
+$chkOpenPairing.Size = New-Object System.Drawing.Size(530, 22)
+$chkOpenPairing.Checked = $true
+$chkOpenPairing.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+$chkOpenPairing.ForeColor = [System.Drawing.Color]::FromArgb(2, 132, 199)
+$pnlFinished.Controls.Add($chkOpenPairing)
+
+$chkOpenPairing.Add_CheckedChanged({
+    if ($chkOpenPairing.Checked) { $chkLaunchNow.Checked = $true }
+})
+$chkLaunchNow.Add_CheckedChanged({
+    if (-not $chkLaunchNow.Checked) { $chkOpenPairing.Checked = $false }
+})
+
+$btnPairNowDirect = New-Object System.Windows.Forms.Button
+$btnPairNowDirect.Text = "Launch Windows Pairing Wizard Now"
+$btnPairNowDirect.Location = New-Object System.Drawing.Point(25, 256)
+$btnPairNowDirect.Size = New-Object System.Drawing.Size(260, 28)
+$btnPairNowDirect.BackColor = [System.Drawing.Color]::FromArgb(2, 132, 199)
+$btnPairNowDirect.ForeColor = [System.Drawing.Color]::White
+$btnPairNowDirect.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+$btnPairNowDirect.FlatAppearance.BorderSize = 0
+$btnPairNowDirect.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+$btnPairNowDirect.Cursor = [System.Windows.Forms.Cursors]::Hand
+$btnPairNowDirect.Add_Click({
+    Start-Process "DevicePairingWizard.exe" -ErrorAction SilentlyContinue
+})
+$pnlFinished.Controls.Add($btnPairNowDirect)
 
 # ----------------- Navigation Logic -----------------
 $script:CurrentStep = 1
@@ -719,7 +750,11 @@ $btnCancel.Add_Click({
         if ($chkLaunchNow.Checked) {
             $AppExe = Join-Path $finalDir "sonybridge-app.exe"
             if (Test-Path $AppExe) {
-                Start-Process -FilePath $AppExe -WorkingDirectory $finalDir
+                if ($chkOpenPairing.Checked) {
+                    Start-Process -FilePath $AppExe -ArgumentList "--pair" -WorkingDirectory $finalDir
+                } else {
+                    Start-Process -FilePath $AppExe -WorkingDirectory $finalDir
+                }
             }
         }
         $form.Close()
