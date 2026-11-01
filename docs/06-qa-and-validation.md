@@ -37,6 +37,10 @@
 | QA-08 | System Tray Quick Menu | Right-click tray icon and switch ANC mode | Mode updates instantly without bringing main window to front | Pending | — |
 | QA-09 | 1-Click Reconnect | Turn headphones off and on; click "Reconnect" | Re-establishes RFCOMM control link cleanly | Pending | — |
 | QA-10 | Audio Endpoint Routing | Play audio in Windows; connect headphones | Windows audio automatically defaults to Stereo A2DP (not Hands-Free) | Pending | — |
+| QA-11 | BLE Beacon vs Classic Audio Distinction | Launch app when only `LE_WH-1000XM3` is paired | Displays `BLE Only (Audio Disconnected)` amber alert and explains Classic pairing requirement | Pass | 2026-11-01 / Win11 / CLI probe + GUI |
+| QA-12 | Guided Headphone Pairing Assistant | Click "Pair Headphones" from header, alert banner, or installer | Modal provides 3-step guide, launches `DevicePairingWizard.exe`, and detects paired device | Pass | 2026-11-01 / Win11 / Subprocess trigger + live watch |
+| QA-13 | Window Startup Display Guarantee | Launch `sonybridge-app.exe` directly | Main window immediately unminimizes, centers, and focuses (HWND non-zero) | Pass | 2026-11-01 / Win11 / HWND: 527162 |
+| QA-14 | Post-Install Pairing Assistant Trigger | Run `SonyBridge-Setup.exe` to completion | Completion screen offers direct pairing trigger and pre-checked launch flag (`--pair`) | Pass | 2026-11-01 / Win11 / Setup Wizard Forms |
 
 ---
 

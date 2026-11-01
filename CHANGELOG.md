@@ -5,6 +5,16 @@ All notable changes to **SonyBridge** are documented in this file.
 ## [0.3.0] - 2026-10-31
 
 ### Added (Milestone M12: Single Unified Executable, Dynamic Tray Telemetry & Setup Ergonomics)
+- **Guided Headphone Pairing Assistant (App & Setup Wizard)**:
+  - Added an interactive 3-step pairing modal in the companion app with 1-click native triggers for `DevicePairingWizard.exe` and `ms-settings-connectabledevices:devicediscovery`, real-time connection watching, and automatic link confirmation.
+  - Integrated a direct "Launch Windows Pairing Wizard Now" action and pre-checked "Launch Guided Headphone Pairing Assistant on startup" (`--pair`) into the setup wizard completion screen.
+- **Dual-Bluetooth Profile Diagnostics (BLE Swift Pair vs Classic Audio)**:
+  - Implemented dual-profile detection in `WindowsBluetoothManager` differentiating `LE_WH-1000XM3` (low-energy beacon without audio/RFCOMM) from `WH-1000XM3` (Classic Audio A2DP/HFP + MDR).
+  - Added real-time diagnostics telemetry, amber `BLE Only (Audio Disconnected)` badge, in-app troubleshooting banner, and 1-click Windows Bluetooth/Sound settings triggers.
+- **Connection Truth & Live Telemetry Polling**:
+  - Eliminated static mocked connection states (`Connected`, `85%`, dummy packet logs); UI defaults to neutral querying state and polls live WinRT/audio status on load and on an active interval.
+- **Setup Script Resilience & Encoding Hardening**:
+  - Replaced UTF-8 bullet characters with clean ASCII to eliminate PowerShell ANSI 1252 mojibake (`â€¢`), and enhanced version detection to dynamically inspect directory hierarchies and folder naming patterns.
 - **Startup Window Guarantee & Setup Fallback**:
   - Ensured `sonybridge-app.exe` immediately surfaces, centers, and focuses the main desktop window on startup in Tauri v2 rather than remaining hidden in the system tray.
   - Hardened `SonyBridge-Setup.exe` with automatic fallback to the companion application GUI and onboarding wizard if external PowerShell scripts are absent.
