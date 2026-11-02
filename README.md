@@ -1,6 +1,7 @@
 <div align="center">
 
-# SonyBridge 🎧 🌉
+# XMCompanion 🎧
+*(formerly SonyBridge)*
 
 **A lightweight, native Windows 10/11 system tray companion that brings the full power of the *Sony | Headphones Connect* app to the PC desktop for the WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series.**
 
@@ -29,7 +30,7 @@ Sony's flagship wireless headphones (**WH-1000XM3**, **WH-1000XM4**, **WH-1000XM
 - **Opaque battery & telemetry:** Windows Bluetooth settings provide coarse or stale battery numbers and zero insight into the headset's active ANC or DSP state.
 - **Bloated workarounds:** Existing alternatives often require virtual kernel audio drivers, heavy Electron wrappers (>150 MB RAM), or manual command-line scripts.
 
-**SonyBridge solves all of this natively in user space with zero kernel drivers, 0% idle CPU, and an instant system tray flyout.**
+**XMCompanion solves all of this natively in user space with zero kernel drivers, 0% idle CPU, and an instant system tray flyout.**
 
 ---
 
@@ -51,7 +52,7 @@ Sony's flagship wireless headphones (**WH-1000XM3**, **WH-1000XM4**, **WH-1000XM
 - **Smart Windows Audio Endpoint Sanitizer (`IPolicyConfig`):** Detects muffled `Hands-Free AG Audio` (`HFP`) endpoints and enforces high-resolution **Stereo (`A2DP`)** across Windows Console, Multimedia, and Communications roles with a single click (or automatically on connect).
 - **Guided Headphone Pairing Assistant & BLE Diagnostics:** Resolves the notorious Windows Swift Pair issue where only the `LE_` beacon is paired with no sound; provides live detection and 1-click native Windows pairing triggers.
 - **Dynamic System Tray Telemetry:** Real-time taskbar tray tooltip dynamically reflects live battery percentage, charging state, and active ANC/profile modes.
-- **Single-Binary Convenience (`sonybridge-app.exe`):** Launches the glassmorphic desktop GUI by default, or run `sonybridge-app probe` and `sonybridge-app --enforce-a2dp` directly in PowerShell for zero-UI diagnostics.
+- **Single-Binary Convenience (`XMCompanion.exe`):** Launches the glassmorphic desktop GUI by default, or run `XMCompanion.exe probe` and `XMCompanion.exe --enforce-a2dp` directly in PowerShell for zero-UI diagnostics.
 - **3-Tab Adaptive Flyout & Live Wire Frame Inspector:** Inspect every outgoing and incoming hexadecimal MDR packet in real time from the **Architecture & Wire Inspector** tab.
 - **Bilingual UI (`EN` / `IT`) & First-Run Onboarding Wizard:** Instant English/Italian localization and guided 3-step setup modal.
 
@@ -59,7 +60,7 @@ Sony's flagship wireless headphones (**WH-1000XM3**, **WH-1000XM4**, **WH-1000XM
 
 ## 📥 Download & Installation
 
-SonyBridge requires **no administrator privileges** and provides four flexible installation and distribution channels:
+XMCompanion requires **no administrator privileges** and provides four flexible installation and distribution channels:
 
 ### Option 1: Microsoft WinGet (Recommended)
 Install directly using the official Windows Package Manager:
@@ -78,12 +79,12 @@ scoop install https://raw.githubusercontent.com/DooperDrew/sonybridge/main/packa
 ```
 
 ### Option 3: Guided Windows Setup Wizard (Zero-Elevation GUI)
-1. Download the standalone installer ([**`SonyBridge-Setup.exe`**](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-Setup.exe)) or portable bundle ([**`SonyBridge-v0.3.0-windows-x64.zip`**](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip)) from [GitHub Releases](https://github.com/DooperDrew/sonybridge/releases/latest).
-2. Run **`SonyBridge-Setup.exe`** (or extract the ZIP and double-click `setup.cmd` / `setup-wizard.ps1`).
+1. Download the standalone installer ([**`XMCompanion-Setup.exe`**](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-Setup.exe)) or portable bundle ([**`XMCompanion-v0.3.0-windows-x64.zip`**](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-v0.3.0-windows-x64.zip)) from [GitHub Releases](https://github.com/DooperDrew/sonybridge/releases/latest).
+2. Run **`XMCompanion-Setup.exe`** (or extract the ZIP and double-click `setup.cmd` / `setup-wizard.ps1`).
 3. The progressive setup wizard lets you:
-   - Choose your installation directory (defaults to `%LOCALAPPDATA%\Programs\SonyBridge`).
-   - Create **Start Menu** (`SonyBridge` & `SonyBridge Diagnostic Probe`) and **Desktop** shortcuts.
-   - Configure automatic launch at Windows sign-in (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\SonyBridge`).
+   - Choose your installation directory (defaults to `%LOCALAPPDATA%\Programs\XMCompanion`).
+   - Create **Start Menu** (`XMCompanion` & `XMCompanion Diagnostic Probe`) and **Desktop** shortcuts.
+   - Configure automatic launch at Windows sign-in (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\XMCompanion`).
    - Automatically register in Windows **Installed apps** (Settings &rarr; Apps / Control Panel) with full 1-click uninstallation support.
 
 *For silent, console, or scripted deployments:*
@@ -100,8 +101,8 @@ scoop install https://raw.githubusercontent.com/DooperDrew/sonybridge/main/packa
 ```
 
 ### Option 4: Portable ZIP (No Installation Required)
-1. Download and extract [`SonyBridge-v0.3.0-portable.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-portable.zip) (or [`SonyBridge-v0.3.0-windows-x64.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip)).
-2. Double-click **`sonybridge-app.exe`** (or run `.\sonybridge-app.exe probe` for headless diagnostics).
+1. Download and extract [`XMCompanion-v0.3.0-portable.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-v0.3.0-portable.zip) (or [`XMCompanion-v0.3.0-windows-x64.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-v0.3.0-windows-x64.zip)).
+2. Double-click **`XMCompanion.exe`** (or run `.\XMCompanion.exe probe` for headless diagnostics).
 3. The headphone tray icon appears immediately in the Windows notification area. Zero registry keys touched—runs cleanly from any local folder or USB drive.
 
 ---

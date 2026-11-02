@@ -9,7 +9,7 @@ use crate::bluetooth::{WinRtRfcommTransport, WindowsBluetoothManager};
 
 /// Runs the full diagnostic probe against local Bluetooth devices and Core Audio endpoints.
 pub async fn run_diagnostic_probe() {
-    println!("=== SonyBridge M0/M9 Diagnostic Probe ===");
+    println!("=== XMCompanion Diagnostic Probe ===");
     println!("\n[1/3] Scanning for paired Sony Bluetooth devices...");
     match WindowsBluetoothManager::discover_paired_sony_devices().await {
         Ok(devices) => {

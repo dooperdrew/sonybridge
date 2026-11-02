@@ -2,9 +2,14 @@
 
 All notable changes to **SonyBridge** are documented in this file.
 
-## [0.3.0] - 2026-10-31
+## [0.3.0] - 2026-11-02
 
-### Added (Milestone M12: Single Unified Executable, Dynamic Tray Telemetry & Setup Ergonomics)
+### Added & Rebranded (Milestone M12 & Rebranding: XMCompanion)
+- **Complete Rebranding to XMCompanion**:
+  - Rebranded application from `SonyBridge` to `XMCompanion` across frontend UI, desktop window title, system tray items, autostart registry entries, AppData config paths, installer wizard (`setup-wizard.ps1`), packaging scripts (`package-release.ps1`), locales (`en.toml`, `it.toml`), documentation, and README.
+  - Added `.gitattributes` vendoring rule for `scripts/**` and `packaging/**` ensuring GitHub Linguist recognizes Rust as the primary language (63.2%).
+  - Expanded GitHub topics and tags for maximum discoverability.
+  - Provided backwards-compatible migration for configuration files (`%APPDATA%\XMCompanion` with fallback to `SonyBridge`) and autostart registry entries.
 - **Guided Headphone Pairing Assistant (App & Setup Wizard)**:
   - Added an interactive 3-step pairing modal in the companion app with 1-click native triggers for `DevicePairingWizard.exe` and `ms-settings-connectabledevices:devicediscovery`, real-time connection watching, and automatic link confirmation.
   - Integrated a direct "Launch Windows Pairing Wizard Now" action and pre-checked "Launch Guided Headphone Pairing Assistant on startup" (`--pair`) into the setup wizard completion screen.

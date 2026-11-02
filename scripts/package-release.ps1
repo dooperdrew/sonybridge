@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-    Builds and packages SonyBridge into a distributable portable ZIP archive, standalone setup executable, and generates WinGet/Scoop manifests.
+    Builds and packages XMCompanion into a distributable portable ZIP archive, standalone setup executable, and generates WinGet/Scoop manifests.
 
 .DESCRIPTION
-    Compiles the workspace in release mode, validates artifacts, creates a single standalone installer (SonyBridge-Setup.exe),
-    assembles a clean portable bundle (SonyBridge-v<Version>-portable.zip and SonyBridge-v<Version>-windows-x64.zip),
+    Compiles the workspace in release mode, validates artifacts, creates a single standalone installer (XMCompanion-Setup.exe),
+    assembles a clean portable bundle (XMCompanion-v<Version>-portable.zip and XMCompanion-v<Version>-windows-x64.zip),
     creates an isolated per-version distribution folder (dist/v<Version>/) containing all standalone executables,
     scripts, and archives for seamless testing, and updates WinGet and Scoop manifests.
 
@@ -37,7 +37,7 @@ $RepoRoot = (Resolve-Path (Join-Path $ScriptDir "..")).Path
 Set-Location $RepoRoot
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "        SonyBridge Release Packaging Tool         " -ForegroundColor Cyan
+Write-Host "       XMCompanion Release Packaging Tool         " -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host "Repository root: $RepoRoot"
 
@@ -73,11 +73,13 @@ if (-not (Test-Path $VersionDistDir)) {
     New-Item -ItemType Directory -Path $VersionDistDir -Force | Out-Null
 }
 
-$PackageName = "SonyBridge-v$Version-windows-x64"
-$PortableName = "SonyBridge-v$Version-portable"
+$PackageName = "XMCompanion-v$Version-windows-x64"
+$PortableName = "XMCompanion-v$Version-portable"
+$LegacyPackageName = "SonyBridge-v$Version-windows-x64"
 $StageDir = Join-Path $DistRoot "staging\$PackageName"
 $ZipPath = Join-Path $VersionDistDir "$PackageName.zip"
 $PortableZipPath = Join-Path $VersionDistDir "$PortableName.zip"
+$LegacyZipPath = Join-Path $VersionDistDir "$LegacyPackageName.zip"
 
 # 1. Build workspace in release mode
 if (-not $SkipBuild) {
@@ -105,18 +107,23 @@ Write-Host "  - Found diagnostic binary:  $CliExe" -ForegroundColor Green
 
 # 3. Create standalone setup executable and stage binaries into dedicated version folder
 Write-Host "`n[3/6] Staging single-file installer & binaries into dist\v$Version\..." -ForegroundColor Cyan
-$SetupExeName = "SonyBridge-Setup.exe"
-$VersionedSetupExeName = "SonyBridge-v$Version-Setup.exe"
+$SetupExeName = "XMCompanion-Setup.exe"
+$VersionedSetupExeName = "XMCompanion-v$Version-Setup.exe"
 
-# Copy binaries into dedicated version directory
+# Copy binaries into dedicated version directory (both XMCompanion.exe and sonybridge-app.exe)
+Copy-Item -Path $AppExe -Destination (Join-Path $VersionDistDir "XMCompanion.exe") -Force
 Copy-Item -Path $AppExe -Destination (Join-Path $VersionDistDir "sonybridge-app.exe") -Force
 Copy-Item -Path $CliExe -Destination (Join-Path $VersionDistDir "sonybridge-cli.exe") -Force
 Copy-Item -Path $AppExe -Destination (Join-Path $VersionDistDir $SetupExeName) -Force
 Copy-Item -Path $AppExe -Destination (Join-Path $VersionDistDir $VersionedSetupExeName) -Force
 
+# Provide legacy installer name for backwards compatibility
+Copy-Item -Path $AppExe -Destination (Join-Path $VersionDistDir "SonyBridge-Setup.exe") -Force
+
 # Also provide root dist copies for compatibility
 Copy-Item -Path $AppExe -Destination (Join-Path $DistRoot $SetupExeName) -Force
 Copy-Item -Path $AppExe -Destination (Join-Path $DistRoot $VersionedSetupExeName) -Force
+Copy-Item -Path $AppExe -Destination (Join-Path $DistRoot "SonyBridge-Setup.exe") -Force
 
 Write-Host "  - Staged standalone installer: $VersionDistDir\$SetupExeName" -ForegroundColor Green
 
@@ -137,7 +144,10 @@ if ($IsccExe -and (Test-Path $InstallerIss)) {
     Write-Host "  Compiling Inno Setup installer..." -ForegroundColor Cyan
     & $IsccExe "/DMyAppVersion=$Version" $InstallerIss
     if ($LASTEXITCODE -eq 0) {
-        $CompiledSetup = Join-Path $DistRoot "SonyBridge-v$Version-Setup.exe"
+        $CompiledSetup = Join-Path $DistRoot "XMCompanion-v$Version-Setup.exe"
+        if (-not (Test-Path $CompiledSetup)) {
+            $CompiledSetup = Join-Path $DistRoot "SonyBridge-v$Version-Setup.exe"
+        }
         if (Test-Path $CompiledSetup) {
             Copy-Item -Path $CompiledSetup -Destination (Join-Path $VersionDistDir $VersionedSetupExeName) -Force
             $SetupItem = Get-Item $CompiledSetup
@@ -156,7 +166,8 @@ Write-Host "`n[5/6] Creating portable ZIP packages and copying scripts into dist
 if (Test-Path $StageDir) { Remove-Item -Path $StageDir -Recurse -Force }
 New-Item -ItemType Directory -Path $StageDir -Force | Out-Null
 
-Copy-Item $AppExe -Destination $StageDir -Force
+Copy-Item $AppExe -Destination (Join-Path $StageDir "XMCompanion.exe") -Force
+Copy-Item $AppExe -Destination (Join-Path $StageDir "sonybridge-app.exe") -Force
 Copy-Item $CliExe -Destination $StageDir -Force
 
 $LocalesSrc = Join-Path $RepoRoot "crates\sonybridge-app\locales"
@@ -198,10 +209,12 @@ if (Test-Path $PortableZipPath) { Remove-Item -Path $PortableZipPath -Force }
 
 Compress-Archive -Path "$StageDir\*" -DestinationPath $ZipPath -CompressionLevel Optimal -Force
 Copy-Item -Path $ZipPath -Destination $PortableZipPath -Force
+Copy-Item -Path $ZipPath -Destination $LegacyZipPath -Force
 
 # Also copy zips to root dist/ for convenience
 Copy-Item -Path $ZipPath -Destination (Join-Path $DistRoot "$PackageName.zip") -Force
 Copy-Item -Path $PortableZipPath -Destination (Join-Path $DistRoot "$PortableName.zip") -Force
+Copy-Item -Path $ZipPath -Destination (Join-Path $DistRoot "$LegacyPackageName.zip") -Force
 
 # Cleanup staging directory
 Remove-Item -Path (Join-Path $DistRoot "staging") -Recurse -Force
@@ -210,6 +223,7 @@ $ZipInfo = Get-Item $ZipPath
 $SizeMB = [math]::Round($ZipInfo.Length / 1MB, 2)
 Write-Host "  - Portable package created: $ZipPath ($SizeMB MB)" -ForegroundColor Green
 Write-Host "  - Portable alias created:   $PortableZipPath" -ForegroundColor Green
+Write-Host "  - Legacy package alias:     $LegacyZipPath" -ForegroundColor Green
 
 # 6. Auto-generate WinGet and Scoop package manifests
 Write-Host "`n[6/6] Generating distribution manifests (WinGet & Scoop)..." -ForegroundColor Cyan
@@ -223,5 +237,5 @@ Write-Host "       RELEASE PACKAGING COMPLETE SUCCESS         " -ForegroundColor
 Write-Host "==================================================" -ForegroundColor Green
 Write-Host "Dedicated Folder: $VersionDistDir" -ForegroundColor Yellow
 Write-Host "Installer:        $VersionDistDir\$SetupExeName" -ForegroundColor Yellow
-Write-Host "App Binary:       $VersionDistDir\sonybridge-app.exe" -ForegroundColor Yellow
+Write-Host "App Binary:       $VersionDistDir\XMCompanion.exe" -ForegroundColor Yellow
 Write-Host "Archive:          $ZipPath ($SizeMB MB)" -ForegroundColor Yellow

@@ -1,4 +1,4 @@
-// SonyBridge v0.2.0 UI Controller
+// XMCompanion v0.3.0 UI Controller
 
 const invoke = window.__TAURI__ ? window.__TAURI__.core.invoke : async (cmd, args) => {
   console.log(`[Mock Tauri Invoke] ${cmd}`, args);
@@ -28,10 +28,10 @@ const I18N = {
     eq_title: "Hardware Equalizer",
     clear_bass: "Clear Bass (DSP Sub-Bass)",
     enforce_a2dp: "Enforce A2DP",
-    autostart_label: "Launch SonyBridge on Windows Login"
+    autostart_label: "Launch XMCompanion on Windows Login"
   },
   it: {
-    subtitle: "Assistente Desktop WH-1000XM3 / XM4 / XM5",
+    subtitle: "Assistente Desktop Sony WH-1000XM & serie WF",
     tab_dashboard: "Pannello & EQ",
     tab_audio: "Windows & Energia",
     tab_architecture: "Architettura & Pacchetti",
@@ -49,7 +49,7 @@ const I18N = {
     eq_title: "Equalizzatore Hardware",
     clear_bass: "Clear Bass (Sub-Bassi DSP)",
     enforce_a2dp: "Forza Stereo A2DP",
-    autostart_label: "Avvia SonyBridge all'accesso di Windows"
+    autostart_label: "Avvia XMCompanion all'accesso di Windows"
   }
 };
 
@@ -528,7 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnUninstallApp = document.getElementById("btn-uninstall-app");
   if (btnUninstallApp) {
     btnUninstallApp.addEventListener("click", () => {
-      if (confirm("Are you sure you want to uninstall SonyBridge? This will launch the uninstallation wizard.")) {
+      if (confirm("Are you sure you want to uninstall XMCompanion? This will launch the uninstallation wizard.")) {
         invoke("trigger_uninstall").catch(console.error);
       }
     });

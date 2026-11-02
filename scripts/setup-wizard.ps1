@@ -1,39 +1,39 @@
 <#
 .SYNOPSIS
-    Guided Windows Setup Wizard for SonyBridge.
+    Guided Windows Setup Wizard for XMCompanion.
 
 .DESCRIPTION
     Provides a zero-elevation graphical (Windows Forms) and interactive console wizard to install
-    SonyBridge into %LOCALAPPDATA%\Programs\SonyBridge, configure Start Menu and Desktop
+    XMCompanion into %LOCALAPPDATA%\Programs\XMCompanion, configure Start Menu and Desktop
     shortcuts, set up logon autostart, register Windows Add/Remove Programs (Installed apps) entry,
-    and launch SonyBridge.
+    and launch XMCompanion.
 
 .PARAMETER TargetDir
-    Installation directory. Defaults to "$env:LOCALAPPDATA\Programs\SonyBridge".
+    Installation directory. Defaults to "$env:LOCALAPPDATA\Programs\XMCompanion".
 
 .PARAMETER CreateDesktopShortcut
-    Creates a desktop shortcut to SonyBridge. Default is on.
+    Creates a desktop shortcut to XMCompanion. Default is on.
 
 .PARAMETER NoDesktopShortcut
     Disables creating the desktop shortcut.
 
 .PARAMETER CreateStartMenuShortcut
-    Creates Start Menu shortcuts to SonyBridge and Diagnostic CLI. Default is on.
+    Creates Start Menu shortcuts to XMCompanion and Diagnostic CLI. Default is on.
 
 .PARAMETER NoStartMenuShortcut
     Disables creating Start Menu shortcuts.
 
 .PARAMETER EnableAutostart
-    Registers SonyBridge to launch automatically on Windows login (HKCU). Default is on.
+    Registers XMCompanion to launch automatically on Windows login (HKCU). Default is on.
 
 .PARAMETER NoAutostart
     Disables autostart on Windows login.
 
 .PARAMETER LaunchOnFinish
-    Launches SonyBridge upon installation completion. Default is on.
+    Launches XMCompanion upon installation completion. Default is on.
 
 .PARAMETER NoLaunch
-    Prevents launching SonyBridge upon completion.
+    Prevents launching XMCompanion upon completion.
 
 .PARAMETER Silent
     Runs the installation unattended with no GUI or prompts using provided parameters.
@@ -45,12 +45,12 @@
     .\setup-wizard.ps1
     .\setup-wizard.ps1 -Silent -NoLaunch
     .\setup-wizard.ps1 -NoGui
-    .\setup-wizard.ps1 -TargetDir "C:\Tools\SonyBridge" -NoAutostart
+    .\setup-wizard.ps1 -TargetDir "C:\Tools\XMCompanion" -NoAutostart
 #>
 
 [CmdletBinding()]
 param (
-    [string]$TargetDir = "$env:LOCALAPPDATA\Programs\SonyBridge",
+    [string]$TargetDir = "$env:LOCALAPPDATA\Programs\XMCompanion",
     [switch]$CreateDesktopShortcut,
     [switch]$NoDesktopShortcut,
     [switch]$CreateStartMenuShortcut,
@@ -86,14 +86,14 @@ $CandidateSources = @(
 
 $SourceDir = $null
 foreach ($cand in $CandidateSources) {
-    if (Test-Path (Join-Path $cand "sonybridge-app.exe")) {
+    if ((Test-Path (Join-Path $cand "XMCompanion.exe")) -or (Test-Path (Join-Path $cand "sonybridge-app.exe"))) {
         $SourceDir = (Resolve-Path $cand).Path
         break
     }
 }
 
 if (-not $SourceDir) {
-    throw "sonybridge-app.exe was not found in $ScriptDir or target\release. Please build the workspace or run from an extracted release package."
+    throw "XMCompanion.exe (or sonybridge-app.exe) was not found in $ScriptDir or target\release. Please build the workspace or run from an extracted release package."
 }
 
 $Version = "0.3.0"
@@ -134,8 +134,8 @@ function Install-SonyBridgePackage {
         }
     }
 
-    Report-Status "Stopping any running SonyBridge processes..." 10
-    Get-Process -Name "sonybridge-app", "sonybridge-cli" -ErrorAction SilentlyContinue | ForEach-Object {
+    Report-Status "Stopping any running XMCompanion processes..." 10
+    Get-Process -Name "XMCompanion", "sonybridge-app", "sonybridge-cli" -ErrorAction SilentlyContinue | ForEach-Object {
         try {
             Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
         } catch {}
@@ -153,7 +153,16 @@ function Install-SonyBridgePackage {
     }
 
     Report-Status "Copying application binaries and components..." 45
-    Copy-Item (Join-Path $SourceDir "sonybridge-app.exe") -Destination $DestinationDir -Force
+    $SrcAppExe = if (Test-Path (Join-Path $SourceDir "XMCompanion.exe")) {
+        Join-Path $SourceDir "XMCompanion.exe"
+    } else {
+        Join-Path $SourceDir "sonybridge-app.exe"
+    }
+
+    # Ensure both XMCompanion.exe and sonybridge-app.exe are present in destination
+    Copy-Item $SrcAppExe -Destination (Join-Path $DestinationDir "XMCompanion.exe") -Force
+    Copy-Item $SrcAppExe -Destination (Join-Path $DestinationDir "sonybridge-app.exe") -Force
+
     $CliSource = Join-Path $SourceDir "sonybridge-cli.exe"
     if (Test-Path $CliSource) {
         Copy-Item $CliSource -Destination $DestinationDir -Force
@@ -195,23 +204,23 @@ function Install-SonyBridgePackage {
     $WshShell = New-Object -ComObject WScript.Shell
 
     if ($AddStartMenuShortcut) {
-        $StartMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\SonyBridge"
+        $StartMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\XMCompanion"
         if (-not (Test-Path $StartMenuDir)) {
             New-Item -ItemType Directory -Path $StartMenuDir -Force | Out-Null
         }
 
-        $s1 = $WshShell.CreateShortcut((Join-Path $StartMenuDir "SonyBridge.lnk"))
-        $s1.TargetPath = Join-Path $DestinationDir "sonybridge-app.exe"
+        $s1 = $WshShell.CreateShortcut((Join-Path $StartMenuDir "XMCompanion.lnk"))
+        $s1.TargetPath = Join-Path $DestinationDir "XMCompanion.exe"
         $s1.WorkingDirectory = $DestinationDir
-        $s1.Description = "SonyBridge - Windows 10/11 Companion for Sony WH-1000XM3/XM4/XM5 Headphones."
+        $s1.Description = "XMCompanion - Windows 10/11 Companion for Sony WH-1000XM & WF Headphones."
         $s1.Save()
 
         if (Test-Path (Join-Path $DestinationDir "sonybridge-cli.exe")) {
-            $s2 = $WshShell.CreateShortcut((Join-Path $StartMenuDir "SonyBridge Diagnostic Probe.lnk"))
+            $s2 = $WshShell.CreateShortcut((Join-Path $StartMenuDir "XMCompanion Diagnostic Probe.lnk"))
             $s2.TargetPath = "powershell.exe"
             $s2.Arguments = "-NoExit -Command `"& '$DestinationDir\sonybridge-cli.exe' probe`""
             $s2.WorkingDirectory = $DestinationDir
-            $s2.Description = "Run SonyBridge Bluetooth RFCOMM & Windows Core Audio diagnostic probe."
+            $s2.Description = "Run XMCompanion Bluetooth RFCOMM & Windows Core Audio diagnostic probe."
             $s2.Save()
         }
     }
@@ -219,10 +228,10 @@ function Install-SonyBridgePackage {
     if ($AddDesktopShortcut) {
         $DesktopDir = [Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)
         if (Test-Path $DesktopDir) {
-            $sDesk = $WshShell.CreateShortcut((Join-Path $DesktopDir "SonyBridge.lnk"))
-            $sDesk.TargetPath = Join-Path $DestinationDir "sonybridge-app.exe"
+            $sDesk = $WshShell.CreateShortcut((Join-Path $DesktopDir "XMCompanion.lnk"))
+            $sDesk.TargetPath = Join-Path $DestinationDir "XMCompanion.exe"
             $sDesk.WorkingDirectory = $DestinationDir
-            $sDesk.Description = "SonyBridge - Sony Bluetooth Headphones Companion for Windows."
+            $sDesk.Description = "XMCompanion - Sony Bluetooth Headphones Companion for Windows."
             $sDesk.Save()
         }
     }
@@ -230,28 +239,37 @@ function Install-SonyBridgePackage {
     Report-Status "Configuring autostart at Windows sign-in..." 85
     $RunKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
     if ($SetAutostart) {
-        $AppBinaryPath = "`"$DestinationDir\sonybridge-app.exe`""
-        Set-ItemProperty -Path $RunKey -Name "SonyBridge" -Value $AppBinaryPath
+        $AppBinaryPath = "`"$DestinationDir\XMCompanion.exe`""
+        Set-ItemProperty -Path $RunKey -Name "XMCompanion" -Value $AppBinaryPath
+        # Clean up legacy SonyBridge autostart
+        try { Remove-ItemProperty -Path $RunKey -Name "SonyBridge" -ErrorAction SilentlyContinue } catch {}
     } else {
         try {
+            Remove-ItemProperty -Path $RunKey -Name "XMCompanion" -ErrorAction SilentlyContinue
             Remove-ItemProperty -Path $RunKey -Name "SonyBridge" -ErrorAction SilentlyContinue
         } catch {}
     }
 
     Report-Status "Registering Windows Installed Apps (Add/Remove Programs) entry..." 95
-    $UninstallKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\SonyBridge"
+    $UninstallKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\XMCompanion"
     if (-not (Test-Path $UninstallKey)) {
         New-Item -Path $UninstallKey -Force | Out-Null
+    }
+
+    # Clean up legacy SonyBridge uninstall registry key
+    $LegacyUninstallKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\SonyBridge"
+    if (Test-Path $LegacyUninstallKey) {
+        try { Remove-Item -Path $LegacyUninstallKey -Recurse -Force -ErrorAction SilentlyContinue } catch {}
     }
 
     $TotalBytes = (Get-ChildItem -Path $DestinationDir -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
     $EstimatedKB = [int][math]::Round(($TotalBytes / 1KB))
 
-    Set-ItemProperty -Path $UninstallKey -Name "DisplayName" -Value "SonyBridge (Sony Headphones Companion for Windows)"
+    Set-ItemProperty -Path $UninstallKey -Name "DisplayName" -Value "XMCompanion (Sony Headphones Companion for Windows)"
     Set-ItemProperty -Path $UninstallKey -Name "DisplayVersion" -Value $Version
-    Set-ItemProperty -Path $UninstallKey -Name "Publisher" -Value "DooperDrew & SonyBridge Contributors"
+    Set-ItemProperty -Path $UninstallKey -Name "Publisher" -Value "DooperDrew & XMCompanion Contributors"
     Set-ItemProperty -Path $UninstallKey -Name "InstallLocation" -Value $DestinationDir
-    Set-ItemProperty -Path $UninstallKey -Name "DisplayIcon" -Value "$DestinationDir\sonybridge-app.exe,0"
+    Set-ItemProperty -Path $UninstallKey -Name "DisplayIcon" -Value "$DestinationDir\XMCompanion.exe,0"
     Set-ItemProperty -Path $UninstallKey -Name "UninstallString" -Value "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$DestinationDir\uninstall.ps1`""
     Set-ItemProperty -Path $UninstallKey -Name "QuietUninstallString" -Value "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$DestinationDir\uninstall.ps1`" -Silent"
     Set-ItemProperty -Path $UninstallKey -Name "InstallDate" -Value ((Get-Date).ToString("yyyyMMdd"))
@@ -262,14 +280,14 @@ function Install-SonyBridgePackage {
     Set-ItemProperty -Path $UninstallKey -Name "NoModify" -Value 1 -Type DWord
     Set-ItemProperty -Path $UninstallKey -Name "NoRepair" -Value 1 -Type DWord
 
-    Report-Status "SonyBridge installation complete!" 100
+    Report-Status "XMCompanion installation complete!" 100
 }
 
 # -----------------------------------------------------------------------------
 # 3. Execution: Silent Mode
 # -----------------------------------------------------------------------------
 if ($Silent) {
-    Write-Host "SonyBridge Silent Setup starting..." -ForegroundColor Cyan
+    Write-Host "XMCompanion Silent Setup starting..." -ForegroundColor Cyan
     Write-Host "Target Directory: $TargetDir"
     Install-SonyBridgePackage `
         -DestinationDir $TargetDir `
@@ -282,8 +300,13 @@ if ($Silent) {
         }
 
     if ($ResolvedLaunchOnFinish) {
-        Write-Host "Launching SonyBridge..." -ForegroundColor Cyan
-        Start-Process -FilePath (Join-Path $TargetDir "sonybridge-app.exe") -WorkingDirectory $TargetDir
+        Write-Host "Launching XMCompanion..." -ForegroundColor Cyan
+        $ExeToLaunch = if (Test-Path (Join-Path $TargetDir "XMCompanion.exe")) {
+            Join-Path $TargetDir "XMCompanion.exe"
+        } else {
+            Join-Path $TargetDir "sonybridge-app.exe"
+        }
+        Start-Process -FilePath $ExeToLaunch -WorkingDirectory $TargetDir
     }
     Write-Host "Silent installation completed successfully." -ForegroundColor Green
     return
@@ -294,7 +317,7 @@ if ($Silent) {
 # -----------------------------------------------------------------------------
 if ($NoGui) {
     Write-Host "==================================================" -ForegroundColor Cyan
-    Write-Host "         SonyBridge Guided Setup (Console)        " -ForegroundColor Cyan
+    Write-Host "         XMCompanion Guided Setup (Console)       " -ForegroundColor Cyan
     Write-Host "==================================================" -ForegroundColor Cyan
     Write-Host "Version: v$Version"
     Write-Host "Source:  $SourceDir`n"
@@ -310,10 +333,10 @@ if ($NoGui) {
     $ansDesktop = Read-Host "Create Desktop shortcut? (Y/n)"
     $ResolvedDesktopShortcut = ($ansDesktop -notmatch "^[nN]")
 
-    $ansAutostart = Read-Host "Start SonyBridge automatically on Windows logon? (Y/n)"
+    $ansAutostart = Read-Host "Start XMCompanion automatically on Windows logon? (Y/n)"
     $ResolvedAutostart = ($ansAutostart -notmatch "^[nN]")
 
-    $ansLaunch = Read-Host "Launch SonyBridge immediately upon completion? (Y/n)"
+    $ansLaunch = Read-Host "Launch XMCompanion immediately upon completion? (Y/n)"
     $ResolvedLaunchOnFinish = ($ansLaunch -notmatch "^[nN]")
 
     Write-Host "`nStarting installation..." -ForegroundColor Cyan
@@ -328,11 +351,16 @@ if ($NoGui) {
         }
 
     if ($ResolvedLaunchOnFinish) {
-        Start-Process -FilePath (Join-Path $TargetDir "sonybridge-app.exe") -WorkingDirectory $TargetDir
+        $ExeToLaunch = if (Test-Path (Join-Path $TargetDir "XMCompanion.exe")) {
+            Join-Path $TargetDir "XMCompanion.exe"
+        } else {
+            Join-Path $TargetDir "sonybridge-app.exe"
+        }
+        Start-Process -FilePath $ExeToLaunch -WorkingDirectory $TargetDir
     }
 
     Write-Host "`nInstallation completed successfully." -ForegroundColor Green
-    Write-Host "SonyBridge is now ready to use at: $TargetDir`n"
+    Write-Host "XMCompanion is now ready to use at: $TargetDir`n"
     return
 }
 
@@ -344,7 +372,7 @@ Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "SonyBridge Setup Wizard"
+$form.Text = "XMCompanion Setup Wizard"
 $form.ClientSize = New-Object System.Drawing.Size(580, 440)
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
 $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
@@ -361,7 +389,7 @@ $pnlHeader.BackColor = [System.Drawing.Color]::FromArgb(15, 23, 42)
 $form.Controls.Add($pnlHeader)
 
 $lblTitle = New-Object System.Windows.Forms.Label
-$lblTitle.Text = "SonyBridge Setup"
+$lblTitle.Text = "XMCompanion Setup"
 $lblTitle.Font = New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold)
 $lblTitle.ForeColor = [System.Drawing.Color]::White
 $lblTitle.Location = New-Object System.Drawing.Point(22, 12)
@@ -426,7 +454,7 @@ $pnlWelcome.BackColor = [System.Drawing.Color]::White
 $form.Controls.Add($pnlWelcome)
 
 $lblWelcomeHeading = New-Object System.Windows.Forms.Label
-$lblWelcomeHeading.Text = "Welcome to the SonyBridge Setup Wizard"
+$lblWelcomeHeading.Text = "Welcome to the XMCompanion Setup Wizard"
 $lblWelcomeHeading.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
 $lblWelcomeHeading.ForeColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
 $lblWelcomeHeading.Location = New-Object System.Drawing.Point(25, 20)
@@ -435,16 +463,17 @@ $pnlWelcome.Controls.Add($lblWelcomeHeading)
 
 $lblWelcomeBody = New-Object System.Windows.Forms.Label
 $lblWelcomeBody.Text = @"
-This wizard will guide you through setting up SonyBridge on your computer.
+This wizard will guide you through setting up XMCompanion on your computer.
 
-SonyBridge brings the full functionality of the Sony | Headphones Connect app to Windows 10 & 11 for the WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series:
+XMCompanion brings the full functionality of the Sony | Headphones Connect app to Windows 10 & 11 for the WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series:
 
-  * Active Noise Canceling & Ambient Sound: Dual NC, Wind Reduction, 20-step Ambient + Voice Focus
-  * Hardware 5-Band Equalizer & Clear Bass: Direct DSP tuning (-10 to +10 dB)
-  * 1-Click Sound Profiles: Focus, Office/Calls, Cinema/Bass Boost, and Studio Reference
-  * Smart Windows A2DP Audio Routing: Eliminates muffled Hands-Free AG Audio degradation
-  * Real-Time Battery & Protocol Wire Inspector: Authentic Sony MDR v1/v2 RFCOMM framing
-  * Zero Elevation Required: Installs cleanly in user space with 0% idle CPU
+  - Active Noise Canceling & Ambient Sound: Dual NC, Wind Reduction, 20-step Ambient + Voice Focus
+  - Hardware 5-Band Equalizer & Clear Bass: Direct DSP tuning (-10 to +10 dB)
+  - 1-Click Sound Profiles: Focus, Office/Calls, Cinema/Bass Boost, and Studio Reference
+  - Smart Windows A2DP Audio Routing: Eliminates muffled Hands-Free AG Audio degradation
+  - Guided Headphone Pairing Assistant: Resolves BLE Swift Pair without audio
+  - Real-Time Battery & Dynamic Tray Telemetry: Status at a glance from taskbar
+  - Zero Elevation Required: Installs cleanly in user space with 0% idle CPU
 
 Click Next to select your installation preferences.
 "@
@@ -469,7 +498,7 @@ $grpDest.Size = New-Object System.Drawing.Size(530, 80)
 $pnlOptions.Controls.Add($grpDest)
 
 $lblDestPrompt = New-Object System.Windows.Forms.Label
-$lblDestPrompt.Text = "Install SonyBridge into the following directory:"
+$lblDestPrompt.Text = "Install XMCompanion into the following directory:"
 $lblDestPrompt.Location = New-Object System.Drawing.Point(15, 20)
 $lblDestPrompt.AutoSize = $true
 $grpDest.Controls.Add($lblDestPrompt)
@@ -486,7 +515,7 @@ $btnBrowse.Location = New-Object System.Drawing.Point(433, 40)
 $btnBrowse.Size = New-Object System.Drawing.Size(82, 26)
 $btnBrowse.Add_Click({
     $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
-    $dlg.Description = "Select SonyBridge Installation Folder"
+    $dlg.Description = "Select XMCompanion Installation Folder"
     $dlg.SelectedPath = $txtTargetDir.Text
     if ($dlg.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $txtTargetDir.Text = $dlg.SelectedPath
@@ -501,35 +530,35 @@ $grpOpts.Size = New-Object System.Drawing.Size(530, 200)
 $pnlOptions.Controls.Add($grpOpts)
 
 $chkStartMenu = New-Object System.Windows.Forms.CheckBox
-$chkStartMenu.Text = "Create Start Menu shortcuts (SonyBridge & Diagnostic Probe)"
+$chkStartMenu.Text = "Create Start Menu shortcuts (XMCompanion & Diagnostic Probe)"
 $chkStartMenu.Location = New-Object System.Drawing.Point(15, 25)
 $chkStartMenu.Size = New-Object System.Drawing.Size(500, 24)
 $chkStartMenu.Checked = $ResolvedStartMenuShortcut
 $grpOpts.Controls.Add($chkStartMenu)
 
 $chkDesktop = New-Object System.Windows.Forms.CheckBox
-$chkDesktop.Text = "Create Desktop shortcut for SonyBridge"
+$chkDesktop.Text = "Create Desktop shortcut for XMCompanion"
 $chkDesktop.Location = New-Object System.Drawing.Point(15, 55)
 $chkDesktop.Size = New-Object System.Drawing.Size(500, 24)
 $chkDesktop.Checked = $ResolvedDesktopShortcut
 $grpOpts.Controls.Add($chkDesktop)
 
 $chkAutostart = New-Object System.Windows.Forms.CheckBox
-$chkAutostart.Text = "Start SonyBridge automatically at Windows sign-in (recommended)"
+$chkAutostart.Text = "Start XMCompanion automatically at Windows sign-in (recommended)"
 $chkAutostart.Location = New-Object System.Drawing.Point(15, 85)
 $chkAutostart.Size = New-Object System.Drawing.Size(500, 24)
 $chkAutostart.Checked = $ResolvedAutostart
 $grpOpts.Controls.Add($chkAutostart)
 
 $chkLaunchWizard = New-Object System.Windows.Forms.CheckBox
-$chkLaunchWizard.Text = "Launch SonyBridge immediately on Finish"
+$chkLaunchWizard.Text = "Launch XMCompanion immediately on Finish"
 $chkLaunchWizard.Location = New-Object System.Drawing.Point(15, 115)
 $chkLaunchWizard.Size = New-Object System.Drawing.Size(500, 24)
 $chkLaunchWizard.Checked = $ResolvedLaunchOnFinish
 $grpOpts.Controls.Add($chkLaunchWizard)
 
 $lblNote = New-Object System.Windows.Forms.Label
-$lblNote.Text = "Note: SonyBridge installs cleanly without UAC prompts or Administrator elevation.`nSound profiles and settings are preserved in %APPDATA%\SonyBridge."
+$lblNote.Text = "Note: XMCompanion installs cleanly without UAC prompts or Administrator elevation.`nSound profiles and settings are preserved in %APPDATA%\XMCompanion."
 $lblNote.Font = New-Object System.Drawing.Font("Segoe UI", 8.25)
 $lblNote.ForeColor = [System.Drawing.Color]::Gray
 $lblNote.Location = New-Object System.Drawing.Point(15, 152)
@@ -545,7 +574,7 @@ $pnlProgress.Visible = $false
 $form.Controls.Add($pnlProgress)
 
 $lblProgTitle = New-Object System.Windows.Forms.Label
-$lblProgTitle.Text = "Installing SonyBridge..."
+$lblProgTitle.Text = "Installing XMCompanion..."
 $lblProgTitle.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
 $lblProgTitle.Location = New-Object System.Drawing.Point(25, 18)
 $lblProgTitle.AutoSize = $true
@@ -582,7 +611,7 @@ $pnlFinished.Visible = $false
 $form.Controls.Add($pnlFinished)
 
 $lblFinTitle = New-Object System.Windows.Forms.Label
-$lblFinTitle.Text = "SonyBridge Setup Completed!"
+$lblFinTitle.Text = "XMCompanion Setup Completed!"
 $lblFinTitle.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
 $lblFinTitle.ForeColor = [System.Drawing.Color]::FromArgb(2, 132, 199)
 $lblFinTitle.Location = New-Object System.Drawing.Point(25, 20)
@@ -597,7 +626,7 @@ $lblFinBody.Size = New-Object System.Drawing.Size(530, 140)
 $pnlFinished.Controls.Add($lblFinBody)
 
 $chkLaunchNow = New-Object System.Windows.Forms.CheckBox
-$chkLaunchNow.Text = "Launch SonyBridge now"
+$chkLaunchNow.Text = "Launch XMCompanion now"
 $chkLaunchNow.Location = New-Object System.Drawing.Point(25, 195)
 $chkLaunchNow.Size = New-Object System.Drawing.Size(450, 22)
 $chkLaunchNow.Checked = $ResolvedLaunchOnFinish
@@ -669,13 +698,13 @@ function Show-Step([int]$step) {
         $btnCancel.FlatAppearance.BorderSize = 0
 
         $lblFinBody.Text = @"
-SonyBridge has been successfully installed on your computer.
+XMCompanion has been successfully installed on your computer.
 
-Your Sony WH-1000XM3 / XM4 / XM5 system tray companion and diagnostic CLI are configured and ready.
+Your Sony WH-1000XM & WF series system tray companion and diagnostic CLI are configured and ready.
 
 Installation Details:
  - Installed to: $($txtTargetDir.Text)
- - Configuration directory: %APPDATA%\SonyBridge
+ - Configuration directory: %APPDATA%\XMCompanion
  - Registered in Windows Installed Apps (Add/Remove Programs)
 
 Click Finish to complete the setup.
@@ -692,7 +721,7 @@ $btnNext.Add_Click({
             [System.Windows.Forms.MessageBox]::Show(
                 $form,
                 "Please specify a valid installation directory.",
-                "SonyBridge Setup",
+                "XMCompanion Setup",
                 [System.Windows.Forms.MessageBoxButtons]::OK,
                 [System.Windows.Forms.MessageBoxIcon]::Warning
             ) | Out-Null
@@ -748,7 +777,11 @@ $btnCancel.Add_Click({
     if ($script:CurrentStep -eq 4) {
         $finalDir = $txtTargetDir.Text.Trim()
         if ($chkLaunchNow.Checked) {
-            $AppExe = Join-Path $finalDir "sonybridge-app.exe"
+            $AppExe = if (Test-Path (Join-Path $finalDir "XMCompanion.exe")) {
+                Join-Path $finalDir "XMCompanion.exe"
+            } else {
+                Join-Path $finalDir "sonybridge-app.exe"
+            }
             if (Test-Path $AppExe) {
                 if ($chkOpenPairing.Checked) {
                     Start-Process -FilePath $AppExe -ArgumentList "--pair" -WorkingDirectory $finalDir
@@ -761,7 +794,7 @@ $btnCancel.Add_Click({
     } else {
         $res = [System.Windows.Forms.MessageBox]::Show(
             $form,
-            "Are you sure you want to cancel SonyBridge Setup?",
+            "Are you sure you want to cancel XMCompanion Setup?",
             "Exit Setup",
             [System.Windows.Forms.MessageBoxButtons]::YesNo,
             [System.Windows.Forms.MessageBoxIcon]::Question

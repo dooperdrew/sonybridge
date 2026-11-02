@@ -1,4 +1,5 @@
-# SonyBridge User Guide 🎧 🌉
+# XMCompanion User Guide 🎧 🌉
+*(formerly SonyBridge)*
 
 **Comprehensive User Manual, Installation Guide & Hardware Testing Reference for Sony Bluetooth Headphones (`WH-1000XM3`, `WH-1000XM4`, `WH-1000XM5`, and `WF` series) on Windows 10 & 11**
 
@@ -23,14 +24,14 @@
 
 ## 1. Introduction & Overview
 
-**SonyBridge** is a native, ultra-lightweight Windows 10 and 11 desktop companion and system tray utility built specifically for Sony wireless headphones (**WH-1000XM3**, **WH-1000XM4**, **WH-1000XM5**, and **WF-1000XM4/XM5**).
+**XMCompanion** is a native, ultra-lightweight Windows 10 and 11 desktop companion and system tray utility built specifically for Sony wireless headphones (**WH-1000XM3**, **WH-1000XM4**, **WH-1000XM5**, and **WF-1000XM4/XM5**).
 
 When connected to Windows, Sony Bluetooth headphones normally suffer from several frustrating limitations:
 - Windows automatically switches audio into the muffled 8 kHz mono **`Hands-Free AG Audio` (`HFP`)** telephony profile whenever an application accesses the microphone.
 - Sony does not offer a Windows version of the mobile *Sony | Headphones Connect* app, leaving you unable to adjust Ambient Sound (`1..20`), Wind Noise Reduction, Focus on Voice, Clear Bass, or the 5-band hardware DSP Equalizer from your PC.
 - Windows Bluetooth settings provide coarse battery indicators and no visibility into active ANC/EQ states.
 
-SonyBridge fixes all of these problems while maintaining strict system integrity:
+XMCompanion fixes all of these problems while maintaining strict system integrity:
 - **0% Idle CPU & `<= 35 MB` RAM:** Purely event-driven Bluetooth RFCOMM socket I/O and UI IPC.
 - **Zero Kernel Drivers & Zero Elevation:** Operates 100% in standard user space without `.sys` drivers or UAC prompts.
 - **100% Offline & Private:** Zero network calls, zero telemetry, and no Sony cloud account required.
@@ -61,15 +62,15 @@ scoop install https://raw.githubusercontent.com/DooperDrew/sonybridge/main/packa
 ```
 
 ### Method 3: Guided Windows Setup Wizard (Zero-Elevation GUI)
-SonyBridge provides a single standalone installer (`SonyBridge-Setup.exe`) and a zero-elevation graphical Windows Setup Wizard:
-1. Download **[`SonyBridge-Setup.exe`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-Setup.exe)** or **[`SonyBridge-v0.3.0-windows-x64.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip)** from [GitHub Releases](https://github.com/DooperDrew/sonybridge/releases/latest).
-2. Run **`SonyBridge-Setup.exe`** (or extract the archive and run `setup.cmd` / `setup-wizard.ps1`).
+XMCompanion provides a single standalone installer (`XMCompanion-Setup.exe`) and a zero-elevation graphical Windows Setup Wizard:
+1. Download **[`XMCompanion-Setup.exe`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-Setup.exe)** or **[`XMCompanion-v0.3.0-windows-x64.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-v0.3.0-windows-x64.zip)** from [GitHub Releases](https://github.com/DooperDrew/sonybridge/releases/latest).
+2. Run **`XMCompanion-Setup.exe`** (or extract the archive and run `setup.cmd` / `setup-wizard.ps1`).
 3. The graphical setup wizard allows you to:
-   - Select your installation directory (default: `%LOCALAPPDATA%\Programs\SonyBridge`, no Administrator privileges needed).
-   - Toggle **Start Menu** (`SonyBridge` and `SonyBridge Diagnostic Probe`) and **Desktop** shortcuts.
-   - Configure automatic launch at Windows sign-in (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\SonyBridge`).
-   - Launch SonyBridge immediately upon completion.
-4. SonyBridge registers cleanly in Windows **Installed apps** (Settings &rarr; Apps / Control Panel) with 1-click uninstallation support.
+   - Select your installation directory (default: `%LOCALAPPDATA%\Programs\XMCompanion`, no Administrator privileges needed).
+   - Toggle **Start Menu** (`XMCompanion` and `XMCompanion Diagnostic Probe`) and **Desktop** shortcuts.
+   - Configure automatic launch at Windows sign-in (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\XMCompanion`).
+   - Launch XMCompanion immediately upon completion.
+4. XMCompanion registers cleanly in Windows **Installed apps** (Settings &rarr; Apps / Control Panel) with 1-click uninstallation support.
 
 For unattended, console, or scripted environments:
 ```powershell
@@ -84,9 +85,9 @@ For unattended, console, or scripted environments:
 ```
 
 ### Method 4: Portable Run (No Installation Required)
-1. Download and extract [`SonyBridge-v0.3.0-portable.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-portable.zip) (or [`SonyBridge-v0.3.0-windows-x64.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip)) into any folder (e.g., `C:\Tools\SonyBridge` or a USB drive).
-2. Double-click **`sonybridge-app.exe`** (or run `.\sonybridge-app.exe probe` in terminal).
-3. The SonyBridge headphone icon appears in your Windows System Tray (notification area next to the clock) and opens the control dashboard.
+1. Download and extract [`XMCompanion-v0.3.0-portable.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-v0.3.0-portable.zip) (or [`XMCompanion-v0.3.0-windows-x64.zip`](https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/XMCompanion-v0.3.0-windows-x64.zip)) into any folder (e.g., `C:\Tools\XMCompanion` or a USB drive).
+2. Double-click **`XMCompanion.exe`** (or run `.\XMCompanion.exe probe` in terminal).
+3. The XMCompanion headphone icon appears in your Windows System Tray (notification area next to the clock) and opens the control dashboard.
 
 ---
 
@@ -95,14 +96,14 @@ For unattended, console, or scripted environments:
 1. Power on your **WH-1000XM3** (or XM4/XM5) headphones.
 2. If not yet paired with your PC, hold the headphone **Power** button for **7 seconds** until the blue LED flashes twice repeatedly and you hear *"Bluetooth pairing"*.
 3. Open Windows **Settings &rarr; Bluetooth & devices &rarr; Add device &rarr; Bluetooth** and select **WH-1000XM3**.
-4. Once Windows displays *Connected voice, music*, click **Connect RFCOMM** in the top-right corner of SonyBridge (or right-click the tray icon and click **Quick Reconnect**).
-5. SonyBridge opens the Sony MDR RFCOMM control channel (`96cc203e-5068-46ad-b32d-396ceebe3928`), synchronizes battery telemetry, and enforces Stereo (`A2DP`) audio if configured.
+4. Once Windows displays *Connected voice, music*, click **Connect RFCOMM** in the top-right corner of XMCompanion (or right-click the tray icon and click **Quick Reconnect**).
+5. XMCompanion opens the Sony MDR RFCOMM control channel (`96cc203e-5068-46ad-b32d-396ceebe3928`), synchronizes battery telemetry, and enforces Stereo (`A2DP`) audio if configured.
 
 ---
 
 ## 4. First-Run Onboarding Wizard & Bilingual UI (`EN` / `IT`)
 
-- **First-Run Onboarding Modal:** On your first launch (when `onboarding_completed` is `false` in `%APPDATA%\SonyBridge\config.json`), SonyBridge presents a guided 3-step onboarding modal explaining Bluetooth pairing, Windows Stereo (`A2DP`) protection, and Sound Profiles. You can re-open the wizard anytime via the **`?`** button in the header.
+- **First-Run Onboarding Modal:** On your first launch (when `onboarding_completed` is `false` in `%APPDATA%\XMCompanion\config.json`), XMCompanion presents a guided 3-step onboarding modal explaining Bluetooth pairing, Windows Stereo (`A2DP`) protection, and Sound Profiles. You can re-open the wizard anytime via the **`?`** button in the header.
 - **Instant Language Switching (`EN` / `IT`):** Click **`EN`** or **`IT`** in the top bar to switch all UI labels, tooltips, and descriptions between English and Italian immediately.
 
 ---
@@ -110,13 +111,13 @@ For unattended, console, or scripted environments:
 ## 5. System Tray & 3-Tab Adaptive Flyout Controls
 
 ### Windows System Tray
-- **Left-Click Tray Icon:** Toggles the SonyBridge window (show/hide).
+- **Left-Click Tray Icon:** Toggles the XMCompanion window (show/hide).
 - **Right-Click Context Menu:**
   - `Sony WH-1000XM3` — Status header
   - `Open Dashboard` — Restores the window to the foreground
   - `Quick Reconnect` — Re-establishes the RFCOMM control channel
-  - `Quit SonyBridge` — Closes the RFCOMM socket cleanly and exits
-- **Close Button (`[X]`):** Minimizes SonyBridge to the system tray so battery monitoring and audio protection stay active with minimal footprint.
+  - `Quit XMCompanion` — Closes the RFCOMM socket cleanly and exits
+- **Close Button (`[X]`):** Minimizes XMCompanion to the system tray so battery monitoring and audio protection stay active with minimal footprint.
 
 ### 3-Tab Adaptive Flyout
 The main interface is organized into three focused tabs:
@@ -216,12 +217,12 @@ Follow these steps when validating physical WH-1000XM3 hardware (tracked in [Mil
 
 ### Option A: Via Windows Settings (Installed Apps)
 1. Open Windows **Settings &rarr; Apps &rarr; Installed apps** (or Control Panel &rarr; *Programs and Features*).
-2. Locate **SonyBridge (Sony Headphones Companion for Windows)** and click **Uninstall**.
+2. Locate **XMCompanion (Sony Headphones Companion for Windows)** and click **Uninstall**.
 
 ### Option B: Via PowerShell Uninstaller Script
-From the installation folder (`%LOCALAPPDATA%\Programs\SonyBridge`) or extracted release archive:
+From the installation folder (`%LOCALAPPDATA%\Programs\XMCompanion`) or extracted release archive:
 ```powershell
-# Interactive uninstaller (asks whether to keep or remove %APPDATA%\SonyBridge profiles):
+# Interactive uninstaller (asks whether to keep or remove %APPDATA%\XMCompanion profiles):
 .\uninstall.ps1
 
 # Automated silent uninstaller (preserves user settings):
@@ -232,9 +233,9 @@ From the installation folder (`%LOCALAPPDATA%\Programs\SonyBridge`) or extracted
 ```
 
 ### Option C: Portable Clean-Up
-If you ran `sonybridge-app.exe` portably without installing:
-1. Right-click the SonyBridge tray icon and select **Quit SonyBridge**.
-2. Delete the folder where you extracted the `.zip` (and optionally `%APPDATA%\SonyBridge`).
+If you ran `XMCompanion.exe` portably without installing:
+1. Right-click the XMCompanion tray icon and select **Quit XMCompanion**.
+2. Delete the folder where you extracted the `.zip` (and optionally `%APPDATA%\XMCompanion`).
 
 ---
 

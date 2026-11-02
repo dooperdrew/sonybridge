@@ -1,10 +1,11 @@
-; Inno Setup Script for SonyBridge
+; Inno Setup Script for XMCompanion
 ; Zero-elevation Windows installer for Sony Bluetooth Headphones (WH-1000XM3 / XM4 / XM5)
-#define MyAppName "SonyBridge"
+#define MyAppName "XMCompanion"
 #define MyAppVersion "0.3.0"
-#define MyAppPublisher "DooperDrew & SonyBridge Contributors"
+#define MyAppPublisher "DooperDrew & XMCompanion Contributors"
 #define MyAppURL "https://github.com/DooperDrew/sonybridge"
-#define MyAppExeName "sonybridge-app.exe"
+#define MyAppExeName "XMCompanion.exe"
+#define MyLegacyExeName "sonybridge-app.exe"
 #define MyCliExeName "sonybridge-cli.exe"
 
 [Setup]
@@ -15,33 +16,34 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}/issues
 AppUpdatesURL={#MyAppURL}/releases
-DefaultDirName={localappdata}\Programs\SonyBridge
+DefaultDirName={localappdata}\Programs\XMCompanion
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 ; Zero Administrator elevation required (per-user install into %LOCALAPPDATA%)
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=..\dist
-OutputBaseFilename=SonyBridge-v{#MyAppVersion}-Setup
+OutputBaseFilename=XMCompanion-v{#MyAppVersion}-Setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
 CloseApplications=yes
-CloseApplicationsFilter={#MyAppExeName},{#MyCliExeName}
+CloseApplicationsFilter={#MyAppExeName},{#MyLegacyExeName},{#MyCliExeName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany={#MyAppPublisher}
-VersionInfoDescription=SonyBridge Setup (Sony Headphones Companion for Windows 10/11)
+VersionInfoDescription=XMCompanion Setup (Sony Headphones Companion for Windows 10/11)
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-Name: "autostart"; Description: "Start SonyBridge automatically at Windows sign-in"; GroupDescription: "Startup options:"
+Name: "autostart"; Description: "Start XMCompanion automatically at Windows sign-in"; GroupDescription: "Startup options:"
 
 [Files]
-Source: "..\target\release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\target\release\{#MyLegacyExeName}"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion
+Source: "..\target\release\{#MyLegacyExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\target\release\{#MyCliExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\crates\sonybridge-app\locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion
@@ -53,16 +55,16 @@ Source: "install.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "setup.cmd"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\SonyBridge"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Comment: "Sony Bluetooth Headphones System Tray Companion"
-Name: "{group}\SonyBridge Diagnostic Probe"; Filename: "powershell.exe"; Parameters: "-NoExit -Command ""& '{app}\{#MyCliExeName}' probe"""; WorkingDir: "{app}"; Comment: "Run Bluetooth RFCOMM & Windows Core Audio diagnostic probe"
-Name: "{group}\Uninstall SonyBridge"; Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\uninstall.ps1"""; Comment: "Uninstall SonyBridge"
-Name: "{autodesktop}\SonyBridge"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon; Comment: "SonyBridge"
+Name: "{group}\XMCompanion"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Comment: "Sony Bluetooth Headphones System Tray Companion"
+Name: "{group}\XMCompanion Diagnostic Probe"; Filename: "powershell.exe"; Parameters: "-NoExit -Command ""& '{app}\{#MyCliExeName}' probe"""; WorkingDir: "{app}"; Comment: "Run Bluetooth RFCOMM & Windows Core Audio diagnostic probe"
+Name: "{group}\Uninstall XMCompanion"; Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\uninstall.ps1"""; Comment: "Uninstall XMCompanion"
+Name: "{autodesktop}\XMCompanion"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon; Comment: "XMCompanion"
 
 [Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "SonyBridge"; ValueData: """{app}\{#MyAppExeName}"""; Tasks: autostart; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "XMCompanion"; ValueData: """{app}\{#MyAppExeName}"""; Tasks: autostart; Flags: uninsdeletevalue
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch SonyBridge"; Flags: nowait postinstall skipifsilent checked
+Filename: "{app}\{#MyAppExeName}"; Description: "Launch XMCompanion"; Flags: nowait postinstall skipifsilent checked
 
 [UninstallDelete]
 Type: files; Name: "{app}\*.log"
@@ -74,7 +76,7 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ResultCode: Integer;
 begin
-  Exec('taskkill.exe', '/F /IM sonybridge-app.exe /IM sonybridge-cli.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('taskkill.exe', '/F /IM XMCompanion.exe /IM sonybridge-app.exe /IM sonybridge-cli.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Result := '';
 end;
 
@@ -82,6 +84,6 @@ function InitializeUninstall(): Boolean;
 var
   ResultCode: Integer;
 begin
-  Exec('taskkill.exe', '/F /IM sonybridge-app.exe /IM sonybridge-cli.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('taskkill.exe', '/F /IM XMCompanion.exe /IM sonybridge-app.exe /IM sonybridge-cli.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Result := True;
 end;

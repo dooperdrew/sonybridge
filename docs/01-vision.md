@@ -1,6 +1,6 @@
 # 01 — Vision
 
-> Status: **APPROVED** | Working name: **SonyBridge**
+> Status: **APPROVED** | App name: **XMCompanion** (formerly SonyBridge)
 
 ## Problem
 Sony produces some of the most popular Active Noise Cancelling headphones on the market (WH-1000XM3, WH-1000XM4, WH-1000XM5, WF-1000XM4/XM5). However, when paired with Windows 10/11 PCs, user experience is fundamentally degraded:
@@ -10,7 +10,7 @@ Sony produces some of the most popular Active Noise Cancelling headphones on the
 4. **Hardware Controls Inaccessible:** Features like Ambient Sound Control (0–20 slider, Focus on Voice), Touch Sensor Lock, and Auto-Power Off idle timeouts cannot be configured from the PC.
 
 ## Goal
-SonyBridge is a lightweight, responsive Windows 10/11 desktop companion and system tray application that bridges Sony Bluetooth headphones to Windows. It brings reliable one-click connectivity, automatic audio endpoint sanity, real-time system tray battery monitoring, and full control over Noise Cancelling, Ambient Sound, and hardware EQ.
+**XMCompanion** is a lightweight, responsive Windows 10/11 desktop companion and system tray application that bridges Sony Bluetooth headphones to Windows. It brings reliable one-click connectivity, automatic audio endpoint sanity, real-time system tray battery monitoring, and full control over Noise Cancelling, Ambient Sound, and hardware EQ.
 
 ## Target users
 - Owners of Sony WH-1000XM3 (and extended family: WH-1000XM4, WH-1000XM5, WF-1000XM3/XM4/XM5) using Windows 10 or 11 for daily work, music, video editing, calls, or gaming.

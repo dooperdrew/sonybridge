@@ -1,10 +1,10 @@
 # AGENTS.md — Mandatory Operating Guidelines for AI Agents
 
-> You are working on **SonyBridge** (https://github.com/DooperDrew/sonybridge).
+> You are working on **XMCompanion** (formerly SonyBridge, https://github.com/DooperDrew/sonybridge).
 > These rules are binding for every agent and every conversation in this repository.
 
 ## 1. Mission
-SonyBridge is a lightweight, responsive Windows 10/11 desktop companion and system tray application for Sony Bluetooth headphones (specifically the WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series). It solves Windows Bluetooth connection headaches and brings the full functionality of the mobile "Sony | Headphones Connect" app to the PC desktop: real-time battery monitoring, Active Noise Canceling (ANC) / Ambient Sound control, 5-band hardware Equalizer & Clear Bass tuning, quick 1-click connect/reconnect, and smart Windows audio endpoint routing.
+XMCompanion is a lightweight, responsive Windows 10/11 desktop companion and system tray application for Sony Bluetooth headphones (specifically the WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series). It solves Windows Bluetooth connection headaches and brings the full functionality of the mobile "Sony | Headphones Connect" app to the PC desktop: real-time battery monitoring, Active Noise Canceling (ANC) / Ambient Sound control, 5-band hardware Equalizer & Clear Bass tuning, quick 1-click connect/reconnect, and smart Windows audio endpoint routing.
 
 ## 2. Mandatory reading order (before any implementation)
 1. `docs/01-vision.md`: problem, principles, non-goals

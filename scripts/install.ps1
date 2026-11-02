@@ -1,47 +1,47 @@
 <#
 .SYNOPSIS
-    Installs SonyBridge for the current user without requiring Administrator privileges.
+    Installs XMCompanion for the current user without requiring Administrator privileges.
 
 .DESCRIPTION
-    Installs SonyBridge into %LOCALAPPDATA%\Programs\SonyBridge, creates Start Menu
+    Installs XMCompanion into %LOCALAPPDATA%\Programs\XMCompanion, creates Start Menu
     and Desktop shortcuts, registers the Windows Installed Apps (Uninstall) entry, optionally configures
     autostart on Windows logon (HKCU), and launches the application.
 
 .PARAMETER TargetDir
-    Installation directory. Defaults to "$env:LOCALAPPDATA\Programs\SonyBridge".
+    Installation directory. Defaults to "$env:LOCALAPPDATA\Programs\XMCompanion".
 
 .PARAMETER CreateDesktopShortcut
-    Creates a desktop shortcut to SonyBridge. Default is on.
+    Creates a desktop shortcut to XMCompanion. Default is on.
 
 .PARAMETER NoDesktopShortcut
     Disables creating the desktop shortcut.
 
 .PARAMETER CreateStartMenuShortcut
-    Creates Start Menu shortcuts to SonyBridge and Diagnostic CLI. Default is on.
+    Creates Start Menu shortcuts to XMCompanion and Diagnostic CLI. Default is on.
 
 .PARAMETER NoStartMenuShortcut
     Disables creating Start Menu shortcuts.
 
 .PARAMETER EnableAutostart
-    Configures SonyBridge to launch automatically on Windows login (per-user HKCU). Default is on.
+    Configures XMCompanion to launch automatically on Windows login (per-user HKCU). Default is on.
 
 .PARAMETER NoAutostart
     Disables autostart on Windows login.
 
 .PARAMETER LaunchNow
-    Starts SonyBridge immediately after installation. Default is on.
+    Starts XMCompanion immediately after installation. Default is on.
 
 .PARAMETER NoLaunch
-    Prevents launching SonyBridge immediately after installation.
+    Prevents launching XMCompanion immediately after installation.
 
 .EXAMPLE
     .\install.ps1
-    .\install.ps1 -TargetDir "C:\Tools\SonyBridge" -NoAutostart
+    .\install.ps1 -TargetDir "C:\Tools\XMCompanion" -NoAutostart
 #>
 
 [CmdletBinding()]
 param (
-    [string]$TargetDir = "$env:LOCALAPPDATA\Programs\SonyBridge",
+    [string]$TargetDir = "$env:LOCALAPPDATA\Programs\XMCompanion",
     [switch]$CreateDesktopShortcut,
     [switch]$NoDesktopShortcut,
     [switch]$CreateStartMenuShortcut,

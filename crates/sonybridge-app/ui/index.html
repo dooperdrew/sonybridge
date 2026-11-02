@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SonyBridge — WH-1000XM3 / XM4 / XM5 Companion</title>
+  <title>XMCompanion — Sony WH-1000XM / WF Desktop Companion</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,8 +17,8 @@
           </svg>
         </div>
         <div class="brand-text">
-          <h1>SonyBridge <span class="ver-badge">v0.3.0</span></h1>
-          <span class="device-name" id="device-name" data-i18n="subtitle">WH-1000XM3 / XM4 / XM5 Desktop Companion</span>
+          <h1>XMCompanion <span class="ver-badge">v0.3.0</span></h1>
+          <span class="device-name" id="device-name" data-i18n="subtitle">Sony WH-1000XM & WF Series Desktop Companion</span>
         </div>
       </div>
 
@@ -214,11 +214,11 @@
 
           <div class="setting-item">
             <div class="setting-text">
-              <h3 data-i18n="autostart_label">Launch SonyBridge on Windows Login</h3>
-              <p>Registers SonyBridge in HKCU\...\CurrentVersion\Run (no administrator privileges required).</p>
+              <h3 data-i18n="autostart_label">Launch XMCompanion on Windows Login</h3>
+              <p>Registers XMCompanion in HKCU\...\CurrentVersion\Run (no administrator privileges required).</p>
             </div>
             <label class="switch">
-              <input type="checkbox" id="autostart-toggle" checked aria-label="Launch SonyBridge on Windows Login">
+              <input type="checkbox" id="autostart-toggle" checked aria-label="Launch XMCompanion on Windows Login">
               <span class="slider-toggle"></span>
             </label>
           </div>
@@ -265,12 +265,12 @@
           <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 0.5rem;">
             <div class="setting-text">
               <h3>Maintenance & Guided Tools</h3>
-              <p>Re-launch the setup onboarding wizard, run terminal diagnostic probe, or cleanly uninstall SonyBridge.</p>
+              <p>Re-launch the setup onboarding wizard, run terminal diagnostic probe, or cleanly uninstall XMCompanion.</p>
             </div>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <button class="btn btn-secondary btn-sm" id="btn-reopen-wizard" title="Re-run the first-run onboarding wizard">Re-run Wizard</button>
               <button class="btn btn-secondary btn-sm" id="btn-run-probe" title="Run diagnostic hardware probe in console">Run Probe</button>
-              <button class="btn btn-secondary btn-sm" id="btn-uninstall-app" style="color: #f87171;" title="Cleanly uninstall SonyBridge">Uninstall</button>
+              <button class="btn btn-secondary btn-sm" id="btn-uninstall-app" style="color: #f87171;" title="Cleanly uninstall XMCompanion">Uninstall</button>
             </div>
           </div>
         </div>
@@ -329,33 +329,33 @@
     <div class="modal-backdrop" id="onboarding-modal" style="display: none;">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>Welcome to SonyBridge 🎧</h2>
+          <h2>Welcome to XMCompanion 🎧</h2>
           <span class="ver-badge">Guided Setup</span>
           <button class="btn-close" id="btn-close-wizard" aria-label="Close Setup Guide" title="Close Setup Guide">&times;</button>
         </div>
         <p class="modal-intro">
-          SonyBridge brings native Noise Canceling, 5-Band Hardware EQ, and Anti-Hands-Free audio routing to your Sony WH-1000XM3 on Windows 10/11.
+          XMCompanion brings native Noise Canceling, 5-Band Hardware EQ, and Anti-Hands-Free audio routing to your Sony WH-1000XM headphones on Windows 10/11.
         </p>
         <div class="wizard-steps">
           <div class="wizard-step">
             <div class="step-num">1</div>
             <div>
               <h4>Pair in Windows Bluetooth Settings</h4>
-              <p>Ensure your WH-1000XM3 is paired with Windows. SonyBridge automatically discovers its MDR RFCOMM channel (UUID <code>96CC203E-...</code>).</p>
+              <p>Ensure your WH-1000XM headphone is paired with Windows. XMCompanion automatically discovers its MDR RFCOMM channel (UUID <code>96CC203E-...</code>).</p>
             </div>
           </div>
           <div class="wizard-step">
             <div class="step-num">2</div>
             <div>
               <h4>Automatic Stereo A2DP Protection</h4>
-              <p>Whenever your headphones connect, SonyBridge prevents Windows from degrading audio into muffled Hands-Free telephony mode.</p>
+              <p>Whenever your headphones connect, XMCompanion prevents Windows from degrading audio into muffled Hands-Free telephony mode.</p>
             </div>
           </div>
           <div class="wizard-step">
             <div class="step-num">3</div>
             <div>
               <h4>System Tray & 1-Click Profiles</h4>
-              <p>Closing the window minimizes SonyBridge to the Windows System Tray so you can switch acoustic profiles anytime with one click.</p>
+              <p>Closing the window minimizes XMCompanion to the Windows System Tray so you can switch acoustic profiles anytime with one click.</p>
             </div>
           </div>
         </div>
@@ -374,7 +374,7 @@
           <button class="btn-close" id="btn-close-pairing" aria-label="Close Pairing Assistant" title="Close Pairing Assistant">&times;</button>
         </div>
         <p class="modal-intro">
-          Follow these 3 steps to pair your headphones for high-resolution Stereo Audio and SonyBridge companion controls.
+          Follow these 3 steps to pair your headphones for high-resolution Stereo Audio and XMCompanion companion controls.
         </p>
 
         <div class="wizard-steps">
@@ -405,7 +405,7 @@
             <div class="step-num">3</div>
             <div>
               <h4>Automatic Detection & Link</h4>
-              <p id="pairing-status-text">SonyBridge is actively scanning for your headphones...</p>
+              <p id="pairing-status-text">XMCompanion is actively scanning for your headphones...</p>
               <div class="pairing-live-indicator" id="pairing-live-indicator" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; font-size: 0.85rem; color: var(--accent-gold);">
                 <span class="status-dot standby" id="pairing-live-dot"></span> <span id="pairing-live-desc">Searching for paired Classic Bluetooth device...</span>
               </div>
@@ -422,7 +422,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <span>SonyBridge v0.3.0 • System Tray Active</span>
+      <span>XMCompanion v0.3.0 • System Tray Active</span>
       <span class="status-fine" id="status-fine">MDR v1 Wire Framing Ready • 0% Idle CPU</span>
     </footer>
   </div>

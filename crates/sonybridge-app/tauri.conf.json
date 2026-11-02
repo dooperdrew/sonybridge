@@ -1,15 +1,15 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "SonyBridge",
+  "productName": "XMCompanion",
   "version": "0.3.0",
-  "identifier": "com.sonybridge.app",
+  "identifier": "com.xmcompanion.app",
   "build": {
     "frontendDist": "./ui"
   },
   "app": {
     "windows": [
       {
-        "title": "SonyBridge — WH-1000XM3 Companion",
+        "title": "XMCompanion — Sony WH-1000XM Desktop Companion",
         "width": 860,
         "height": 780,
         "minWidth": 640,

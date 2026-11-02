@@ -29,7 +29,15 @@ fn default_config_path() -> PathBuf {
     let base = std::env::var("APPDATA")
         .map(PathBuf::from)
         .unwrap_or_else(|_| PathBuf::from("."));
-    base.join("SonyBridge").join("config.json")
+    let new_path = base.join("XMCompanion").join("config.json");
+    if new_path.exists() {
+        return new_path;
+    }
+    let old_path = base.join("SonyBridge").join("config.json");
+    if old_path.exists() {
+        return old_path;
+    }
+    new_path
 }
 
 #[derive(Deserialize)]
@@ -133,7 +141,7 @@ async fn set_anc_mode(
 
     if let Some(tray) = app.tray_by_id("main_tray") {
         let _ = tray.set_tooltip(Some(format!(
-            "SonyBridge — WH-1000XM3 (85% • {})",
+            "XMCompanion — WH-1000XM3 (85% • {})",
             payload.mode
         )));
     }
@@ -232,7 +240,7 @@ async fn apply_sound_profile(
         }
 
         if let Some(tray) = app.tray_by_id("main_tray") {
-            let _ = tray.set_tooltip(Some(format!("SonyBridge — WH-1000XM3 ({profile_name})")));
+            let _ = tray.set_tooltip(Some(format!("XMCompanion — WH-1000XM3 ({profile_name})")));
         }
 
         Ok(CommandResult {
@@ -426,7 +434,8 @@ async fn trigger_reconnect(
             }
 
             if let Some(tray) = app.tray_by_id("main_tray") {
-                let _ = tray.set_tooltip(Some(format!("SonyBridge — {} (Connected)", device.name)));
+                let _ =
+                    tray.set_tooltip(Some(format!("XMCompanion — {} (Connected)", device.name)));
             }
 
             return Ok(CommandResult {
@@ -448,7 +457,7 @@ async fn trigger_reconnect(
     }
 
     if let Some(tray) = app.tray_by_id("main_tray") {
-        let _ = tray.set_tooltip(Some("SonyBridge — Disconnected".to_string()));
+        let _ = tray.set_tooltip(Some("XMCompanion — Disconnected".to_string()));
     }
 
     Ok(CommandResult {
@@ -627,12 +636,12 @@ fn main() {
     // 5. Help / CLI information
     if args.iter().any(|a| a == "--help" || a == "-h") {
         sonybridge_windows::attach_parent_console();
-        println!("SonyBridge — Sony Bluetooth Headphones System Tray Companion");
-        println!("\nUsage: sonybridge-app.exe [OPTIONS] [COMMAND]");
+        println!("XMCompanion — Sony Bluetooth Headphones System Tray Companion");
+        println!("\nUsage: xmcompanion.exe [OPTIONS] [COMMAND]");
         println!("\nCommands:");
         println!("  probe              Probe local Bluetooth environment for paired Sony headphones and audio endpoints");
         println!("\nOptions:");
-        println!("  --gui, --settings  Open the SonyBridge desktop control window (default)");
+        println!("  --gui, --settings  Open the XMCompanion desktop control window (default)");
         println!("  --enforce-a2dp     Enforce high-resolution Stereo A2DP audio routing");
         println!("  --setup, --install Launch the guided Windows Setup Wizard");
         println!("  --uninstall        Launch the clean uninstallation wizard");
@@ -676,7 +685,7 @@ fn main() {
         ])
         .setup(|app| {
             // Build Context Menu for System Tray
-            let header_item = MenuItemBuilder::with_id("header", "SonyBridge — Ready")
+            let header_item = MenuItemBuilder::with_id("header", "XMCompanion — Ready")
                 .enabled(false)
                 .build(app)?;
             let profile_focus =
@@ -690,7 +699,7 @@ fn main() {
             let reconnect_item =
                 MenuItemBuilder::with_id("reconnect", "Quick Reconnect").build(app)?;
             let show_item = MenuItemBuilder::with_id("show", "Open Dashboard").build(app)?;
-            let quit_item = MenuItemBuilder::with_id("quit", "Quit SonyBridge").build(app)?;
+            let quit_item = MenuItemBuilder::with_id("quit", "Quit XMCompanion").build(app)?;
 
             let tray_menu = MenuBuilder::new(app)
                 .items(&[
@@ -706,7 +715,7 @@ fn main() {
 
             // Build System Tray Icon with unique ID for dynamic telemetry updates
             let _tray = TrayIconBuilder::with_id("main_tray")
-                .tooltip("SonyBridge — Desktop Companion")
+                .tooltip("XMCompanion — Desktop Companion")
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
@@ -767,5 +776,5 @@ fn main() {
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("error while running SonyBridge application");
+        .expect("error while running XMCompanion application");
 }

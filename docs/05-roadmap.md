@@ -53,5 +53,6 @@
 - [x] **M12.1**: Unified Single-Binary CLI Dispatch: embed diagnostic probe (`probe`), A2DP enforcement (`--enforce-a2dp`), and setup/uninstall flags into `sonybridge-app.exe` with console attachment (`2026-10-31`)
 - [x] **M12.2**: Dynamic System Tray Telemetry: real-time `main_tray` tooltip updates on ANC/ambient mode transitions, sound profile switches, and battery telemetry (`2026-10-31`)
 - [x] **M12.3**: In-App Maintenance & Guided Tools: added Re-run Wizard, Run Probe, and Clean Uninstall triggers inside the Windows & Power settings panel (`2026-10-31`)
-- [x] **M12.4**: Single-Binary Distribution & Packaging Overhaul: updated `scripts/package-release.ps1` to produce standalone installer (`SonyBridge-Setup.exe`) and single-binary clean portable archive (`SonyBridge-v0.3.0-portable.zip`) (`2026-10-31`)
+- [x] **M12.4**: Single-Binary Distribution & Packaging Overhaul: updated `scripts/package-release.ps1` to produce standalone installer (`XMCompanion-Setup.exe`) and single-binary clean portable archive (`XMCompanion-v0.3.0-portable.zip`) (`2026-10-31`)
 - [x] **M12.5**: GitHub Governance & Spec Synchronization: added `.github/ISSUE_TEMPLATE/qa_verification.yml`, aligned release workflows, and authored `docs/retrospective.md` (`2026-10-31`)
+- [x] **M12.6**: Repository Rebranding & GitHub Discoverability: adapted narrative, UI, desktop window, tray, AppData paths, setup wizard, and packaging to `XMCompanion`; vendored scripts via `.gitattributes` to restore Rust as #1 language (63.2%) (`2026-11-02`)

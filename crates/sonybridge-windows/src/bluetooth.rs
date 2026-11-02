@@ -172,7 +172,7 @@ impl WindowsBluetoothManager {
                 troubleshooting_steps: vec![
                     "Turn on your headphones (press Power once).".to_string(),
                     "Ensure your headphones are within Bluetooth range.".to_string(),
-                    "Click 'Reconnect' in SonyBridge once powered on.".to_string(),
+                    "Click 'Reconnect' in XMCompanion once powered on.".to_string(),
                 ],
             }
         } else if let Some(ble_name) = ble_found {
@@ -195,7 +195,7 @@ impl WindowsBluetoothManager {
                     "Turn headphones completely OFF.".to_string(),
                     "Press and hold the Power button for 7 SECONDS until you hear 'Bluetooth pairing'.".to_string(),
                     "In Windows Settings -> Bluetooth & devices -> Add device -> Bluetooth, select 'WH-1000XM3' (headphone icon, NOT LE_).".to_string(),
-                    "Once paired, return to SonyBridge and click 'Reconnect'.".to_string(),
+                    "Once paired, return to XMCompanion and click 'Reconnect'.".to_string(),
                 ],
             }
         } else {

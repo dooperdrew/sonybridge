@@ -19,4 +19,4 @@ Installers:
       - RelativeFilePath: sonybridge-cli.exe
         PortableCommandAlias: sonybridge-cli
     InstallerUrl: https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip
-    InstallerSha256: D180C06CC15760931946DBE438E30740BB138A0966A6E02016857137599C367C
+    InstallerSha256: 58F7D7DCF0B1380CAB52F3A9B305C958A9D335DB2E2EB42EA0A16DF0CE6B65DE

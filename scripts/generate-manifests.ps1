@@ -38,10 +38,21 @@ if (-not $Version) {
 }
 if (-not $Version) { $Version = "0.2.0" }
 
-Write-Host "Generating package manifests for SonyBridge v$Version..." -ForegroundColor Cyan
+Write-Host "Generating package manifests for XMCompanion / SonyBridge v$Version..." -ForegroundColor Cyan
 
 if (-not $ArchivePath) {
-    $ArchivePath = Join-Path $RepoRoot "dist\SonyBridge-v$Version-windows-x64.zip"
+    $CandArchives = @(
+        (Join-Path $RepoRoot "dist\v$Version\XMCompanion-v$Version-windows-x64.zip"),
+        (Join-Path $RepoRoot "dist\XMCompanion-v$Version-windows-x64.zip"),
+        (Join-Path $RepoRoot "dist\v$Version\SonyBridge-v$Version-windows-x64.zip"),
+        (Join-Path $RepoRoot "dist\SonyBridge-v$Version-windows-x64.zip")
+    )
+    foreach ($cand in $CandArchives) {
+        if (Test-Path $cand) {
+            $ArchivePath = $cand
+            break
+        }
+    }
 }
 
 if (-not (Test-Path $ArchivePath)) {
