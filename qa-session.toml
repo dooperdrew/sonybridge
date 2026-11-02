@@ -1,9 +1,9 @@
 # =============================================================================
-# ui-qa-tester Session Configuration for SonyBridge
+# GhostQA (ui-qa-tester) Session Configuration for XMCompanion (SonyBridge)
 # Target repository: https://github.com/DooperDrew/xmcompanion
 # =============================================================================
 
-session_name = "sonybridge-ui-qa"
+session_name = "xmcompanion-ui-qa"
 
 target_exe = 'C:\Dev\AgenticAI\sonybridge\target\release\sonybridge-app.exe'
 target_args = []
@@ -14,8 +14,8 @@ focus_mode = "background"
 max_steps = 12
 
 destructive_control_regex = '(?i)\b(delete|format|factory\s*reset|erase|wipe|uninstall|flash\s*firmware)\b'
-output_dir = "qa-reports/sonybridge"
-target_github_repo = "DooperDrew/sonybridge"
+output_dir = "qa-reports/xmcompanion"
+target_github_repo = "DooperDrew/xmcompanion"
 locale = "en"
 
 [hardware]
