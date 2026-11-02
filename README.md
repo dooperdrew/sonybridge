@@ -49,6 +49,9 @@ Sony's flagship wireless headphones (**WH-1000XM3**, **WH-1000XM4**, **WH-1000XM
 - **Hardware 5-Band Equalizer & Clear Bass (`0x58`):** Tune hardware DSP bands (`400 Hz`, `1 kHz`, `2.5 kHz`, `6.3 kHz`, `16 kHz`) from `-10` to `+10` dB and **Clear Bass** (`-10..+10`) directly in headphone EEPROM memory.
 - **1-Click Sound Profiles:** Instantly switch between **Focus (Max ANC)**, **Office / Calls**, **Cinema / Bass Boost**, and **Studio Reference**.
 - **Smart Windows Audio Endpoint Sanitizer (`IPolicyConfig`):** Detects muffled `Hands-Free AG Audio` (`HFP`) endpoints and enforces high-resolution **Stereo (`A2DP`)** across Windows Console, Multimedia, and Communications roles with a single click (or automatically on connect).
+- **Guided Headphone Pairing Assistant & BLE Diagnostics:** Resolves the notorious Windows Swift Pair issue where only the `LE_` beacon is paired with no sound; provides live detection and 1-click native Windows pairing triggers.
+- **Dynamic System Tray Telemetry:** Real-time taskbar tray tooltip dynamically reflects live battery percentage, charging state, and active ANC/profile modes.
+- **Single-Binary Convenience (`sonybridge-app.exe`):** Launches the glassmorphic desktop GUI by default, or run `sonybridge-app probe` and `sonybridge-app --enforce-a2dp` directly in PowerShell for zero-UI diagnostics.
 - **3-Tab Adaptive Flyout & Live Wire Frame Inspector:** Inspect every outgoing and incoming hexadecimal MDR packet in real time from the **Architecture & Wire Inspector** tab.
 - **Bilingual UI (`EN` / `IT`) & First-Run Onboarding Wizard:** Instant English/Italian localization and guided 3-step setup modal.
 
