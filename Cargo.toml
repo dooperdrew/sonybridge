@@ -10,9 +10,9 @@ members = [
 [workspace.package]
 version = "0.3.0"
 edition = "2021"
-authors = ["SonyBridge Contributors"]
+authors = ["XMCompanion Contributors"]
 license = "MIT"
-repository = "https://github.com/DooperDrew/sonybridge"
+repository = "https://github.com/DooperDrew/xmcompanion"
 
 [workspace.dependencies]
 sonybridge-core = { path = "crates/sonybridge-core" }

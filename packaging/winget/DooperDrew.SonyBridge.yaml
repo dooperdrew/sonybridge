@@ -4,7 +4,7 @@ PackageVersion: 0.3.0
 PackageLocale: en-US
 Publisher: DooperDrew
 PackageName: SonyBridge
-PackageUrl: https://github.com/DooperDrew/sonybridge
+PackageUrl: https://github.com/DooperDrew/xmcompanion
 License: MIT
 ShortDescription: Windows 10/11 system tray companion for Sony WH-1000XM3/XM4/XM5 headphones (Battery, ANC, 5-Band EQ, Clear Bass, A2DP routing).
 ManifestType: singleton
@@ -18,5 +18,5 @@ Installers:
         PortableCommandAlias: sonybridge
       - RelativeFilePath: sonybridge-cli.exe
         PortableCommandAlias: sonybridge-cli
-    InstallerUrl: https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip
+    InstallerUrl: https://github.com/DooperDrew/xmcompanion/releases/download/v0.3.0/XMCompanion-v0.3.0-windows-x64.zip
     InstallerSha256: 58F7D7DCF0B1380CAB52F3A9B305C958A9D335DB2E2EB42EA0A16DF0CE6B65DE

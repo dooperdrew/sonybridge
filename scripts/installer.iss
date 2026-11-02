@@ -3,7 +3,7 @@
 #define MyAppName "XMCompanion"
 #define MyAppVersion "0.3.0"
 #define MyAppPublisher "DooperDrew & XMCompanion Contributors"
-#define MyAppURL "https://github.com/DooperDrew/sonybridge"
+#define MyAppURL "https://github.com/DooperDrew/xmcompanion"
 #define MyAppExeName "XMCompanion.exe"
 #define MyLegacyExeName "sonybridge-app.exe"
 #define MyCliExeName "sonybridge-cli.exe"

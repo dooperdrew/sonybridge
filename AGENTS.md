@@ -1,6 +1,6 @@
 # AGENTS.md — Mandatory Operating Guidelines for AI Agents
 
-> You are working on **XMCompanion** (formerly SonyBridge, https://github.com/DooperDrew/sonybridge).
+> You are working on **XMCompanion** (https://github.com/DooperDrew/xmcompanion).
 > These rules are binding for every agent and every conversation in this repository.
 
 ## 1. Mission

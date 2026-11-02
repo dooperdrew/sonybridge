@@ -92,7 +92,7 @@ NestedInstallerFiles:
     PortableCommandAlias: sonybridge-cli
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/DooperDrew/sonybridge/releases/download/v$Version/SonyBridge-v$Version-windows-x64.zip
+    InstallerUrl: https://github.com/DooperDrew/xmcompanion/releases/download/v$Version/XMCompanion-v$Version-windows-x64.zip
     InstallerSha256: $Hash
     UpgradeBehavior: install
 ManifestType: installer
@@ -106,16 +106,16 @@ PackageVersion: $Version
 PackageLocale: en-US
 Publisher: DooperDrew
 PublisherUrl: https://github.com/DooperDrew
-PublisherSupportUrl: https://github.com/DooperDrew/sonybridge/issues
+PublisherSupportUrl: https://github.com/DooperDrew/xmcompanion/issues
 Author: DooperDrew
 PackageName: SonyBridge
-PackageUrl: https://github.com/DooperDrew/sonybridge
+PackageUrl: https://github.com/DooperDrew/xmcompanion
 License: MIT
-LicenseUrl: https://github.com/DooperDrew/sonybridge/blob/main/LICENSE
+LicenseUrl: https://github.com/DooperDrew/xmcompanion/blob/main/LICENSE
 Copyright: Copyright (c) 2026 DooperDrew
 ShortDescription: Native Windows 10/11 system tray companion for Sony WH-1000XM3/XM4/XM5 Bluetooth headphones.
 Description: |
-  SonyBridge is a lightweight, native Windows 10/11 x64 system tray companion for Sony Bluetooth headphones
+  SonyBridge / XMCompanion is a lightweight, native Windows 10/11 x64 system tray companion for Sony Bluetooth headphones
   (WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series). Features real-time battery monitoring, Active Noise Canceling (ANC)
   and 20-step Ambient Sound control, 5-band hardware Equalizer and Clear Bass tuning, 1-click Sound Profiles,
   and smart Windows Core Audio Stereo (A2DP) routing with 0% idle CPU.
@@ -132,7 +132,7 @@ Tags:
   - audio
   - rust
   - windows11
-ReleaseNotesUrl: https://github.com/DooperDrew/sonybridge/releases/tag/v$Version
+ReleaseNotesUrl: https://github.com/DooperDrew/xmcompanion/releases/tag/v$Version
 ManifestType: defaultLocale
 ManifestVersion: 1.9.0
 "@
@@ -151,7 +151,7 @@ PackageVersion: $Version
 PackageLocale: en-US
 Publisher: DooperDrew
 PackageName: SonyBridge
-PackageUrl: https://github.com/DooperDrew/sonybridge
+PackageUrl: https://github.com/DooperDrew/xmcompanion
 License: MIT
 ShortDescription: Windows 10/11 system tray companion for Sony WH-1000XM3/XM4/XM5 headphones (Battery, ANC, 5-Band EQ, Clear Bass, A2DP routing).
 ManifestType: singleton
@@ -165,7 +165,7 @@ Installers:
         PortableCommandAlias: sonybridge
       - RelativeFilePath: sonybridge-cli.exe
         PortableCommandAlias: sonybridge-cli
-    InstallerUrl: https://github.com/DooperDrew/sonybridge/releases/download/v$Version/SonyBridge-v$Version-windows-x64.zip
+    InstallerUrl: https://github.com/DooperDrew/xmcompanion/releases/download/v$Version/XMCompanion-v$Version-windows-x64.zip
     InstallerSha256: $Hash
 "@
 [System.IO.File]::WriteAllText($SingletonPath, $SingletonYaml, $Utf8NoBom)
@@ -178,11 +178,11 @@ $ScoopJson = @"
 {
     "version": "$Version",
     "description": "Lightweight Windows 10/11 system tray companion for Sony Bluetooth headphones (WH-1000XM3/XM4/XM5): real-time battery, ANC/Ambient Sound, 5-band Equalizer & Clear Bass, and smart A2DP audio routing.",
-    "homepage": "https://github.com/DooperDrew/sonybridge",
+    "homepage": "https://github.com/DooperDrew/xmcompanion",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/DooperDrew/sonybridge/releases/download/v$Version/SonyBridge-v$Version-windows-x64.zip",
+            "url": "https://github.com/DooperDrew/xmcompanion/releases/download/v$Version/XMCompanion-v$Version-windows-x64.zip",
             "hash": "$HashLower"
         }
     },
@@ -203,7 +203,7 @@ $ScoopJson = @"
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/DooperDrew/sonybridge/releases/download/v`$version/SonyBridge-v`$version-windows-x64.zip"
+                "url": "https://github.com/DooperDrew/xmcompanion/releases/download/v`$version/XMCompanion-v`$version-windows-x64.zip"
             }
         }
     }

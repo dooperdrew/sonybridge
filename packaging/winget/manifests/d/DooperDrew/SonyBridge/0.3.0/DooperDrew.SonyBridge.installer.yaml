@@ -10,7 +10,7 @@ NestedInstallerFiles:
     PortableCommandAlias: sonybridge-cli
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/DooperDrew/sonybridge/releases/download/v0.3.0/SonyBridge-v0.3.0-windows-x64.zip
+    InstallerUrl: https://github.com/DooperDrew/xmcompanion/releases/download/v0.3.0/XMCompanion-v0.3.0-windows-x64.zip
     InstallerSha256: 58F7D7DCF0B1380CAB52F3A9B305C958A9D335DB2E2EB42EA0A16DF0CE6B65DE
     UpgradeBehavior: install
 ManifestType: installer

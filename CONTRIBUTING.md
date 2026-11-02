@@ -50,7 +50,7 @@ cargo build --workspace --release
 ```
 
 ### 4. Capturing Hardware Diagnostic Logs (WH-1000XM3 / XM4 / XM5)
-If you are testing with physical Sony headphones, run the headless diagnostic probe and paste the JSON output into Issue [`#10`](https://github.com/DooperDrew/sonybridge/issues/10) or [`#11`](https://github.com/DooperDrew/sonybridge/issues/11):
+If you are testing with physical Sony headphones, run the headless diagnostic probe and paste the JSON output into Issue [`#10`](https://github.com/DooperDrew/xmcompanion/issues/10) or [`#11`](https://github.com/DooperDrew/xmcompanion/issues/11):
 ```powershell
 .\sonybridge-cli.exe probe
 ```

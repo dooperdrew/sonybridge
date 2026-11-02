@@ -1,6 +1,6 @@
 # =============================================================================
 # ui-qa-tester Session Configuration for SonyBridge
-# Target repository: https://github.com/DooperDrew/sonybridge
+# Target repository: https://github.com/DooperDrew/xmcompanion
 # =============================================================================
 
 session_name = "sonybridge-ui-qa"

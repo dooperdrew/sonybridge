@@ -4,16 +4,16 @@ PackageVersion: 0.3.0
 PackageLocale: en-US
 Publisher: DooperDrew
 PublisherUrl: https://github.com/DooperDrew
-PublisherSupportUrl: https://github.com/DooperDrew/sonybridge/issues
+PublisherSupportUrl: https://github.com/DooperDrew/xmcompanion/issues
 Author: DooperDrew
 PackageName: SonyBridge
-PackageUrl: https://github.com/DooperDrew/sonybridge
+PackageUrl: https://github.com/DooperDrew/xmcompanion
 License: MIT
-LicenseUrl: https://github.com/DooperDrew/sonybridge/blob/main/LICENSE
+LicenseUrl: https://github.com/DooperDrew/xmcompanion/blob/main/LICENSE
 Copyright: Copyright (c) 2026 DooperDrew
 ShortDescription: Native Windows 10/11 system tray companion for Sony WH-1000XM3/XM4/XM5 Bluetooth headphones.
 Description: |
-  SonyBridge is a lightweight, native Windows 10/11 x64 system tray companion for Sony Bluetooth headphones
+  SonyBridge / XMCompanion is a lightweight, native Windows 10/11 x64 system tray companion for Sony Bluetooth headphones
   (WH-1000XM3, WH-1000XM4, WH-1000XM5, and WF series). Features real-time battery monitoring, Active Noise Canceling (ANC)
   and 20-step Ambient Sound control, 5-band hardware Equalizer and Clear Bass tuning, 1-click Sound Profiles,
   and smart Windows Core Audio Stereo (A2DP) routing with 0% idle CPU.
@@ -30,6 +30,6 @@ Tags:
   - audio
   - rust
   - windows11
-ReleaseNotesUrl: https://github.com/DooperDrew/sonybridge/releases/tag/v0.3.0
+ReleaseNotesUrl: https://github.com/DooperDrew/xmcompanion/releases/tag/v0.3.0
 ManifestType: defaultLocale
 ManifestVersion: 1.9.0

@@ -1,6 +1,6 @@
 # Operating Rules & Instructions for GitHub Copilot
 
-> **Repository:** `https://github.com/DooperDrew/sonybridge`  
+> **Repository:** `https://github.com/DooperDrew/xmcompanion`  
 > **Role of GitHub Copilot:** Worker Subagent / Fast Draft Implementer  
 > **Lead Orchestrator & Sole Committer:** Antigravity (Local Lead Agent)
 
