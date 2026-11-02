@@ -34,3 +34,7 @@
 *.exe binary
 *.dll binary
 *.db binary
+
+# GitHub Linguist Overrides - ensure Rust is recognized as the primary language
+scripts/** linguist-vendored
+packaging/** linguist-vendored
